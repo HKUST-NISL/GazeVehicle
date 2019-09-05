@@ -16,6 +16,7 @@ use eye gaze to control the movement of a vehicle in ros
 ### Demo
 TBD
 ```
-python xxx.py
+cd $ROOT_REPO
+python src/ee_command_node.py
 ```
 
