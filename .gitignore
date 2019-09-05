@@ -1,5 +1,6 @@
 *.pyc
 /models
+/asserts
 .idea
 *.o
 *.so
