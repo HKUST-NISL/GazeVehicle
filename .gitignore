@@ -1,0 +1,6 @@
+*.pyc
+/models
+.idea
+*.o
+*.so
+*.tgz
