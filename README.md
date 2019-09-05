@@ -9,7 +9,8 @@ use eye gaze to control the movement of a vehicle in ros
 
 
 ### Preparation
-Download the eye gaze [model](https://www.dropbox.com/s/t5twn8t7uq46f61/models.tgz?dl=0) and extract it to $ROOT_REPO
+Download the eye gaze [model](https://www.dropbox.com/sh/h23x33stlrhqvqq/AADn4iK7NMIc8bVnOkBpBBMSa?dl=0) and extract it to $ROOT_REPO
+Download other related asserts [asserts](https://www.dropbox.com/sh/pah5vjpvlohslzo/AABFl5nAcgtbosXDb9ZeqplWa?dl=0) and extract it to $ROOT_REPO
 
 
 ### Demo
