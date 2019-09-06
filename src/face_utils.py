@@ -27,11 +27,17 @@ def rect_to_bb(rect):
 
 def angle_to_direction(angle):
     th = 10
-    yaw = angle[0] * (180 / np.pi)
-    pitch = angle[1] * (180 / np.pi)
+    pitch = angle[0] * (180 / np.pi)
+    yaw = angle[1] * (180 / np.pi)
 
-    if pitch < th:
+    if np.abs(yaw) < 10 and pitch > -th:
         return 'forward'
+    
+    if yaw > th:
+        return 'left'
+
+    if yaw < -th:
+        return 'right' 
     
     return 'backward'
 
