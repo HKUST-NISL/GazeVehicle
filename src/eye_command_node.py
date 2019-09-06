@@ -128,7 +128,6 @@ if __name__ == '__main__':
                 shape = predictor(frame, rect)
                 shape = face_utils.shape_to_np(shape)
                 status = face_utils.get_mouth_status(shape)
-                print('mouth status is %s' % (status))
 
                 for i, (x, y) in enumerate(shape):
                     cv2.circle(frame_small, (int(x*scale), int(y*scale)), 1, (0, 0, 255), -1)
@@ -143,9 +142,8 @@ if __name__ == '__main__':
                                                        x_r: rigt_img[None, :]})
 
                 direction = face_utils.angle_to_direction(y_result[0])
-                print(y_result)
 
-                print(direction)
+                print('mouth: %s eye: %s' % (status, direction))
 
                 break
             
