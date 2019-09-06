@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def shape_to_np(shape):
     # initialize the list of (x, y)-coordinates
     coords = np.zeros((68, 2), dtype=np.float32)
@@ -25,3 +24,19 @@ def rect_to_bb(rect):
  
 	# return a tuple of (x, y, w, h)
 	return (x, y, w, h)
+
+def angle_to_direction(angle):
+    th = 10
+    yaw = angle[0] * (180 / np.pi)
+    pitch = angle[1] * (180 / np.pi)
+
+    if pitch < th:
+        return 'forward'
+    
+    return 'backward'
+
+def get_mouth_status(shape):
+    up_lib = shape[61:64]
+    down_lib = shape[[67, 66, 65]]
+
+    
