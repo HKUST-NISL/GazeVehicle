@@ -37,6 +37,14 @@ def angle_to_direction(angle):
 
 def get_mouth_status(shape):
     up_lib = shape[61:64]
-    down_lib = shape[[67, 66, 65]]
+    dn_lib = shape[[67, 66, 65]]
 
-    
+    margin = (dn_lib[:, 1] - up_lib[:, 1]).mean()
+
+    if margin > 30:
+        return 'open'
+
+    return 'closed'
+
+
+
