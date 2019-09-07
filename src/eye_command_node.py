@@ -54,6 +54,10 @@ if __name__ == '__main__':
                         default='./asserts/camera_matrix.mat',
                             help="Path to camera matrix")
 
+    parser.add_argument("--camera_ind", type=str,
+                        default=0,
+                            help="camera index")
+
     FLAGS, unparsed = parser.parse_known_args()
 
     scale = 0.25
@@ -94,7 +98,9 @@ if __name__ == '__main__':
 
     saver = tf.train.Saver()
 
-    video_capture = cv2.VideoCapture(0)
+    print("camera index: ", FLAGS.camera_ind, type(FLAGS.camera_ind))
+    
+    video_capture = cv2.VideoCapture(int(FLAGS.camera_ind))
     video_capture.set(3, 1920)
     video_capture.set(4, 1080)
 
