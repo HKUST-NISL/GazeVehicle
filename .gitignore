@@ -2,6 +2,9 @@
 /models
 /asserts
 .idea
+/devel
+/build
 *.o
 *.so
 *.tgz
+.catkin_workspace
