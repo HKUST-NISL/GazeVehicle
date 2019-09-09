@@ -43,16 +43,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--vgg_dir', type=str,
-                        default='./asserts/vgg16_weights.npz',
+                        default='./models/vgg16_weights.npz',
                         help='Directory for pretrained vgg16')
     
     parser.add_argument("--shape-predictor", type=str,
-                        default='./asserts/shape_predictor_68_face_landmarks.dat',
+                        default='./models/shape_predictor_68_face_landmarks.dat',
                             help="Path to facial landmark predictor")
     
     parser.add_argument("--camera_mat", type=str,
-                        default='./asserts/camera_matrix.mat',
+                        default='./models/camera_matrix.mat',
                             help="Path to camera matrix")
+
+    parser.add_argument("--gaze_model", type=str,
+                        default='./models/model21.ckpt',
+                            help="Path to eye gaze model")
 
     parser.add_argument("--camera_ind", type=str,
                         default=0,
@@ -106,7 +110,7 @@ if __name__ == '__main__':
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, "./models/model21.ckpt")
+        saver.restore(sess, FLAGS.gaze_model)
 
         success, frame = video_capture.read()
         
