@@ -17,6 +17,7 @@ import scipy.io as spio
 
 import face_utils
 import preprocess_eye as pre_eye
+from geometry_msgs.msg import Twist
 
 # parameters setting
 cap_region_x_begin=0.5  # start point/total width
@@ -35,7 +36,38 @@ triggerSwitch = False  # if true, keyborad simulator works
 skinkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
 
+def encode_msg(status, direction):
+    msg = Twist()
+    msg.linear.x = 0
+    msg.linear.y = 0
+    msg.linear.z = 0
+
+    msg.angular.x = 0
+    msg.angular.y = 0
+    msg.angular.z = 0
+    
+    if status == 'open' and direction == 'forward':
+        msg.linear.x = 0.05
+
+    if status == 'open' and direction == 'left':
+        msg.angular.z = 0.05
+
+    if status == 'open' and direction == 'right':
+        msg.angular.z = -0.05
+
+    if status == 'open' and direction == 'backward':
+        msg.linear.x = -0.05
+
+    rospy.loginfo(msg)
+    
+    return msg
+    
+
 if __name__ == '__main__':
+
+    pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(10) # 10hz
     
     print('Starting...')
     
@@ -115,7 +147,7 @@ if __name__ == '__main__':
         success, frame = video_capture.read()
         
 
-        while(success):
+        while(success and (not rospy.is_shutdown())):
             frame = frame[:,::-1,:].copy()
             frame = cv2.resize(frame, (1920, 1080))
             frame_small = cv2.resize(frame, None, fx=scale, fy=scale,interpolation = cv2.INTER_CUBIC)
@@ -154,6 +186,9 @@ if __name__ == '__main__':
                 direction = face_utils.angle_to_direction(y_result[0])
 
                 print('mouth: %s eye: %s' % (status, direction))
+
+                msg = encode_msg(status, direction)
+                pub.publish(msg)
 
                 break
             
