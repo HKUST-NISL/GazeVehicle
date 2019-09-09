@@ -1,11 +1,12 @@
 # EyeVehicle
 use eye gaze to control the movement of a vehicle in ros
 
-### Steps
-1. Face detection and analysis
-2. Eye gaze estimation
-3. Mouth status estimation
-4. Control signal rendering
+### What's in this repo?
+-[x] A robot with camera sensor
+-[x] Face detection and analysis
+-[x] Eye gaze estimation
+-[x] Mouth status estimation
+-[x] Control signal rendering to the robot
 
 
 ### Preparation
@@ -13,10 +14,25 @@ use eye gaze to control the movement of a vehicle in ros
 - Download other related asserts [asserts](https://www.dropbox.com/sh/pah5vjpvlohslzo/AABFl5nAcgtbosXDb9ZeqplWa?dl=0) and extract it to $ROOT_REPO
 
 
-### Demo
-TBD
+### Compile
 ```
 cd $ROOT_REPO
-python src/eye_command_node.py
+catkin_make
+echo '$ROOT_REPO/devel/setup.bash' > ~/.bashrc
+source ~/.bashrc
+```
+
+### Demo
+
+```
+cd $ROOT_REPO
+# show robot in gazebo
+roslaunch mybot_gazebo mybot_world.launch
+
+# show image from the robot camera
+rosrun image_view image_view image:=/mybot/camera1/image_raw
+
+# use mouth and eyes to send the comand
+python script/eye_command_node.py
 ```
 
