@@ -37,13 +37,30 @@ skinkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
 
 def encode_msg(status, direction):
-    msg.linear.x = 1
+    msg = Twist()
+    msg.linear.x = 0
     msg.linear.y = 0
     msg.linear.z = 0
 
     msg.angular.x = 0
     msg.angular.y = 0
-    msg.angular.z = 0.1
+    msg.angular.z = 0
+    
+    if status == 'open' and direction == 'forward':
+        msg.linear.x = 0.05
+
+    if status == 'open' and direction == 'left':
+        msg.angular.z = 0.05
+
+    if status == 'open' and direction == 'right':
+        msg.angular.z = -0.05
+
+    if status == 'open' and direction == 'backward':
+        msg.linear.x = -0.05
+
+    rospy.loginfo(msg)
+    
+    return msg
     
 
 if __name__ == '__main__':
