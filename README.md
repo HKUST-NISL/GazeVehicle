@@ -2,11 +2,11 @@
 use eye gaze to control the movement of a vehicle in ros
 
 ### What's in this repo?
--[x] A robot with camera sensor
--[x] Face detection and analysis
--[x] Eye gaze estimation
--[x] Mouth status estimation
--[x] Control signal rendering to the robot
+- [x] A robot with camera sensor
+- [x] Face detection and analysis
+- [x] Eye gaze estimation
+- [x] Mouth status estimation
+- [x] Control signal rendering to the robot
 
 
 ### Preparation
