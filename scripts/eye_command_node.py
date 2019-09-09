@@ -45,18 +45,21 @@ def encode_msg(status, direction):
     msg.angular.x = 0
     msg.angular.y = 0
     msg.angular.z = 0
+
+    speed = 0.02
+    ang_sped = 0.05
     
     if status == 'open' and direction == 'forward':
-        msg.linear.x = 0.05
+        msg.linear.x = speed
 
     if status == 'open' and direction == 'left':
-        msg.angular.z = 0.05
+        msg.angular.z = ang_sped
 
     if status == 'open' and direction == 'right':
-        msg.angular.z = -0.05
+        msg.angular.z = -ang_sped
 
     if status == 'open' and direction == 'backward':
-        msg.linear.x = -0.05
+        msg.linear.x = -speed
 
     rospy.loginfo(msg)
     
