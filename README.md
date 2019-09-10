@@ -1,7 +1,10 @@
 # EyeVehicle
 use eye gaze to control the movement of a vehicle in ros
 
-![Demo](./asserts/demo.gif)
+
+<div align=center><img src="./asserts/demo.gif" width="800" height="450" ></div>
+
+
 
 ### What's in this repo?
 - [x] A robot with camera sensor
@@ -26,8 +29,7 @@ source ~/.bashrc
 ### Demo
 
 1. Show robot in gazebo simulator
-
-![bot_gazebo](./asserts/bot_gazebo.png)
+<div align=center><img src="./asserts/bot_gazebo.png" width="800" height="450" ></div>
 
 ```
 cd $ROOT_REPO
@@ -37,7 +39,7 @@ roslaunch mybot_gazebo mybot_world.launch
 
 2. Show image obtained by the camera on the robot
 
-![bot_camera](./asserts/bot_camera.png)
+<div align=center><img src="./asserts/bot_camera.png" width="800" height="450" ></div>
 
 ```
 # show image from the robot camera
