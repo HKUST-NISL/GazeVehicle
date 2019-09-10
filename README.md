@@ -1,6 +1,8 @@
 # EyeVehicle
 use eye gaze to control the movement of a vehicle in ros
 
+![Demo](./asserts/demo.gif)
+
 ### What's in this repo?
 - [x] A robot with camera sensor
 - [x] Face detection and analysis
