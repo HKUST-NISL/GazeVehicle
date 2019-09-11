@@ -36,7 +36,26 @@ triggerSwitch = False  # if true, keyborad simulator works
 skinkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
 
-def encode_msg(status, direction, spacekey=False):
+def is_moving(msg):
+
+    if msg is None:
+        return False
+
+    if msg.linear.x == 0 and \
+        msg.linear.y == 0 and \
+        msg.linear.z == 0 and \
+        msg.angular.x == 0 and \
+        msg.angular.y == 0 and \
+        msg.angular.z == 0:
+        return False
+
+    return True
+
+def encode_msg(status, direction, spacekey, last_msg):
+
+    if (status == 'open' or spacekey) and is_moving(last_msg):
+        return last_msg 
+
     msg = Twist()
     msg.linear.x = 0
     msg.linear.y = 0
@@ -46,20 +65,28 @@ def encode_msg(status, direction, spacekey=False):
     msg.angular.y = 0
     msg.angular.z = 0
 
-    speed = 0.02
-    ang_sped = 0.05
+    speed = 0.05
+    ang_sped = 0.1
+    cur_moving = False
+
+
+    rospy.loginfo((spacekey, status, direction))
     
     if (status == 'open' or spacekey) and direction == 'forward':
         msg.linear.x = speed
+        cur_moving = True
 
     if (status == 'open' or spacekey) and direction == 'left':
         msg.angular.z = ang_sped
+        cur_moving = True
 
     if (status == 'open' or spacekey) and direction == 'right':
         msg.angular.z = -ang_sped
+        cur_moving = True
 
     if (status == 'open' or spacekey) and direction == 'backward':
         msg.linear.x = -speed
+        cur_moving = True
 
     rospy.loginfo(msg)
     
@@ -152,6 +179,8 @@ if __name__ == '__main__':
         status = None
         direction = None
         spacekey = False
+        last_msg = None
+
 
         while(success and (not rospy.is_shutdown())):
             frame = frame[:,::-1,:].copy()
@@ -214,9 +243,11 @@ if __name__ == '__main__':
 
             rospy.loginfo(spacekey)
 
+            status = cur_status
+            direction = cur_direction
 
-
-            msg = encode_msg(status, direction, spacekey)
+            msg = encode_msg(status, direction, spacekey, last_msg)
+            last_msg = msg
             pub.publish(msg)
 
             success, frame = video_capture.read()
