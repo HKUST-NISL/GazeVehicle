@@ -8,7 +8,7 @@
     </include-->
 
     <include>
-      <uri>model://robocup14_spl_field</uri>
+      <uri>model://robocup09_spl_field</uri>
     </include>
 
     <include>

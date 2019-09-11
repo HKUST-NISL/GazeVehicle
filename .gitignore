@@ -6,4 +6,5 @@
 *.o
 *.so
 *.tgz
+.vscode
 .catkin_workspace

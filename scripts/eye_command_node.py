@@ -36,7 +36,26 @@ triggerSwitch = False  # if true, keyborad simulator works
 skinkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
 
-def encode_msg(status, direction):
+def is_moving(msg):
+
+    if msg is None:
+        return False
+
+    if msg.linear.x == 0 and \
+        msg.linear.y == 0 and \
+        msg.linear.z == 0 and \
+        msg.angular.x == 0 and \
+        msg.angular.y == 0 and \
+        msg.angular.z == 0:
+        return False
+
+    return True
+
+def encode_msg(status, direction, spacekey, last_msg):
+
+    if (status == 'open' or spacekey) and is_moving(last_msg):
+        return last_msg 
+
     msg = Twist()
     msg.linear.x = 0
     msg.linear.y = 0
@@ -46,20 +65,28 @@ def encode_msg(status, direction):
     msg.angular.y = 0
     msg.angular.z = 0
 
-    speed = 0.02
-    ang_sped = 0.05
+    speed = 0.05
+    ang_sped = 0.1
+    cur_moving = False
+
+
+    rospy.loginfo((spacekey, status, direction))
     
-    if status == 'open' and direction == 'forward':
+    if (status == 'open' or spacekey) and direction == 'forward':
         msg.linear.x = speed
+        cur_moving = True
 
-    if status == 'open' and direction == 'left':
+    if (status == 'open' or spacekey) and direction == 'left':
         msg.angular.z = ang_sped
+        cur_moving = True
 
-    if status == 'open' and direction == 'right':
+    if (status == 'open' or spacekey) and direction == 'right':
         msg.angular.z = -ang_sped
+        cur_moving = True
 
-    if status == 'open' and direction == 'backward':
+    if (status == 'open' or spacekey) and direction == 'backward':
         msg.linear.x = -speed
+        cur_moving = True
 
     rospy.loginfo(msg)
     
@@ -149,6 +176,11 @@ if __name__ == '__main__':
 
         success, frame = video_capture.read()
         
+        status = None
+        direction = None
+        spacekey = False
+        last_msg = None
+
 
         while(success and (not rospy.is_shutdown())):
             frame = frame[:,::-1,:].copy()
@@ -158,6 +190,14 @@ if __name__ == '__main__':
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             rects_small = detector(gray_small, 1)
+
+            face_img = np.zeros((64, 96)).astype(np.uint8)
+            left_img = np.zeros((64, 96)).astype(np.uint8)
+            rigt_img = np.zeros((64, 96)).astype(np.uint8)
+
+            cur_status = None
+            cur_direction = None
+            cur_spacekey = None
 
             for (ii, rect_s) in enumerate(rects_small):
                 
@@ -172,7 +212,7 @@ if __name__ == '__main__':
                 # get face landmarks
                 shape = predictor(frame, rect)
                 shape = face_utils.shape_to_np(shape)
-                status = face_utils.get_mouth_status(shape)
+                cur_status = face_utils.get_mouth_status(shape)
 
                 for i, (x, y) in enumerate(shape):
                     cv2.circle(frame_small, (int(x*scale), int(y*scale)), 1, (0, 0, 255), -1)
@@ -186,20 +226,29 @@ if __name__ == '__main__':
                                                        x_l: left_img[None, :],
                                                        x_r: rigt_img[None, :]})
 
-                direction = face_utils.angle_to_direction(y_result[0])
+                cur_direction = face_utils.angle_to_direction(y_result[0])
 
-                print('mouth: %s eye: %s' % (status, direction))
-
-                msg = encode_msg(status, direction)
-                pub.publish(msg)
-
+                print('mouth: %s eye: %s' % (cur_status, cur_direction))
+  
                 break
             
             cv2.imshow("frame", frame_small)
             cv2.imshow("face_img", face_img)
             cv2.imshow("left_img", left_img)
             cv2.imshow("rigt_img", rigt_img)
-            cv2.waitKey(10)
+            c = cv2.waitKey(10)
+            
+            if c == 32:
+                spacekey = (not spacekey)
+
+            rospy.loginfo(spacekey)
+
+            status = cur_status
+            direction = cur_direction
+
+            msg = encode_msg(status, direction, spacekey, last_msg)
+            last_msg = msg
+            pub.publish(msg)
 
             success, frame = video_capture.read()
 
