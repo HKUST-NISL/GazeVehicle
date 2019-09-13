@@ -48,6 +48,10 @@ rosrun image_view image_view image:=/mybot/camera1/image_raw
 
 3. Analyze mouth status and estimate eye gaze to control the robot
 
+   - Eye gaze is to control the moving direction. 
+      - look down to move backword
+   - Start moving by open your mouth or push space key
+
 ```
 # use mouth and eyes to send the comand
 python script/eye_command_node.py
