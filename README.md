@@ -53,4 +53,3 @@ rosrun image_view image_view image:=/mybot/camera1/image_raw
 # use mouth and eyes to send the comand
 python script/eye_command_node.py
 ```
-
