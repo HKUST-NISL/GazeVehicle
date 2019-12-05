@@ -1,4 +1,4 @@
-# EyeVehicle
+# GazeVehicle
 use eye gaze to control the movement of a vehicle in ros
 
 <div align=center><img src="./asserts/demo.gif" width="800" height="450" ></div>
