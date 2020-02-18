@@ -53,3 +53,16 @@ rosrun image_view image_view image:=/mybot/camera1/image_raw
 # use mouth and eyes to send the comand
 python script/eye_command_node.py
 ```
+
+### Cite
+This repo's model is from the paper below:
+```
+@inproceedings{chen2018appearance,
+  title={Appearance-based gaze estimation using dilated-convolutions},
+  author={Chen, Zhaokang and Shi, Bertram E},
+  booktitle={Asian Conference on Computer Vision},
+  pages={309--324},
+  year={2018},
+  organization={Springer}
+}
+```
