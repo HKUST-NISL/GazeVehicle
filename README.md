@@ -12,6 +12,7 @@ use eye gaze to control the movements of a vehicle in ros
 
 
 ### Preparation
+- install python libs: `dlib', 'scipy`
 - Download the eye gaze [models](https://www.dropbox.com/sh/h23x33stlrhqvqq/AADn4iK7NMIc8bVnOkBpBBMSa?dl=0) and extract it to $ROOT_REPO
 
 
@@ -19,8 +20,7 @@ use eye gaze to control the movements of a vehicle in ros
 ```
 cd $ROOT_REPO
 catkin_make
-echo '$ROOT_REPO/devel/setup.bash' >> ~/.bashrc
-source ~/.bashrc
+source ./devel/setup.bash
 ```
 
 ### Demo
@@ -51,6 +51,7 @@ rosrun image_view image_view image:=/mybot/camera1/image_raw
 
 ```
 # use mouth and eyes to send the comand
+source ./devel/setup.bash
 python script/eye_command_node.py
 ```
 
