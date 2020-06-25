@@ -20,7 +20,6 @@ use eye gaze to control the movements of a vehicle in ros
 ```
 cd $ROOT_REPO
 catkin_make
-source ./devel/setup.bash
 ```
 
 ### Demo
@@ -31,6 +30,7 @@ source ./devel/setup.bash
 ```
 cd $ROOT_REPO
 # show robot in gazebo
+source ./devel/setup.bash
 roslaunch mybot_gazebo mybot_world.launch
 ```
 
