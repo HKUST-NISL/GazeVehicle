@@ -19,7 +19,7 @@ use eye gaze to control the movements of a vehicle in ros
 ```
 cd $ROOT_REPO
 catkin_make
-echo '$ROOT_REPO/devel/setup.bash' > ~/.bashrc
+echo '$ROOT_REPO/devel/setup.bash' >> ~/.bashrc
 source ~/.bashrc
 ```
 
