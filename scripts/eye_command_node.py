@@ -170,7 +170,9 @@ if __name__ == '__main__':
     video_capture.set(3, 1920)
     video_capture.set(4, 1080)
 
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    config.gpu_options.per_process_gpu_memory_fraction = 0.65
+    with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         saver.restore(sess, FLAGS.gaze_model)
 
