@@ -116,7 +116,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     msg.angular.y = 0
     msg.angular.z = 0
 
-    speed = 0.1 # originally 0.05
+    speed = 0.7 # originally 0.05
     ang_sped = 0.15
     cur_moving = False
 
