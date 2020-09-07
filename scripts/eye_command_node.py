@@ -19,6 +19,8 @@ import face_utils
 import preprocess_eye as pre_eye
 from geometry_msgs.msg import Twist
 
+from gaze_projection import gaze_to_screen
+
 # parameters setting
 cap_region_x_begin=0.5  # start point/total width
 cap_region_y_end=0.8  # start point/total width
@@ -70,7 +72,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     cur_moving = False
 
 
-    rospy.loginfo((spacekey, status, direction))
+    # rospy.loginfo((spacekey, status, direction))
     
     if (status == 'open' or spacekey) and direction == 'forward':
         msg.linear.x = speed
@@ -88,7 +90,7 @@ def encode_msg(status, direction, spacekey, last_msg):
         msg.linear.x = -speed
         cur_moving = True
 
-    rospy.loginfo(msg)
+    # rospy.loginfo(msg)
     
     return msg
     
@@ -145,6 +147,8 @@ if __name__ == '__main__':
     dataset = spio.loadmat(FLAGS.camera_mat)
     
     cameraMat = dataset['camera_matrix']
+    print(cameraMat)
+    
     inv_cameraMat = np.linalg.inv(cameraMat)
     cam_new = np.mat([[1536., 0., 960.],[0., 1536., 540.],[0., 0., 1.]])
     cam_face = np.mat([[1536., 0., 48.],[0., 1536., 48.],[0., 0., 1.]])
@@ -227,6 +231,8 @@ if __name__ == '__main__':
                                                        x_f: face_img[None, :],
                                                        x_l: left_img[None, :],
                                                        x_r: rigt_img[None, :]})
+                gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
+                print(gaze_p, face_p)
 
                 cur_direction = face_utils.angle_to_direction(y_result[0])
 
@@ -243,7 +249,7 @@ if __name__ == '__main__':
             if c == 32:
                 spacekey = (not spacekey)
 
-            rospy.loginfo(spacekey)
+            # rospy.loginfo(spacekey)
 
             status = cur_status
             direction = cur_direction
