@@ -56,7 +56,6 @@ while(True):
     gray = cv2.cvtColor(img_res, cv2.COLOR_BGR2GRAY)
     dets = detector(gray, 1)
     for face in dets:
-        #在图片中标注人脸，并显示
         left = int(face.left()*scale)
         top = int(face.top()*scale)
         right = int(face.right()*scale)
@@ -84,7 +83,7 @@ while(True):
 
 
         font = cv2.FONT_HERSHEY_SIMPLEX
-        img = cv2.putText(img, f'X:{x:0.2f}, Y:{y:0.2f}, Z:{z:0.2f}', (cent_w-200, 50), font, 1.2, (0, 0, 255), 2)
+        img = cv2.putText(img, 'X:%0.2f, Y:%0.2f, Z:%0.2f' % (x, y, z), (cent_w-200, 50), font, 1.2, (0, 0, 255), 2)
         
 
     cv2.imshow("face", img)
@@ -92,5 +91,5 @@ while(True):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
  
-cap.release()#关闭相机
+cap.release()
 
