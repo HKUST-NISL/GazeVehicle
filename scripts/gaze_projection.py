@@ -15,7 +15,7 @@ cent_h, cent_w = (int(v0), int(u0))
 face_w = 16
 face_h = 16
 
-gaze = [0, 0]
+
 
 input_w = 320
 
@@ -31,13 +31,13 @@ def compute_Rcf(x, y, z):
     esp = 0.000001
     sx = 0
     cx = 1
-    sy = -z / ((z**2+x**2)**0.5+esp)
-    cy = -x / ((z**2+x**2)**0.5+esp)
+    sy = -x / ((z**2+x**2)**0.5+esp)
+    cy = -z / ((z**2+x**2)**0.5+esp)
     sz = 0
     cz = 1
 
     R = np.zeros((4, 4))
-    R[:, 3] = [-x, -y, -z, 1]
+    R[:, 3] = [x, y, z, 1]
 
     R[:3, :3] = np.array([[cz*cy, cz*sy*sx-sz*cx, cz*sy*cx+sz*sx], 
                             [sz*cy, sz*sy*sx+cz*cx, sz*sy*cx-cz*sx], 
@@ -54,24 +54,32 @@ def gaze_to_screen(gaze, face, scale=0.25):
     right = int(face.right() / scale)
     bottom = int(face.bottom() / scale)
 
-
     point_w, point_h = ((left + right)//2, (top+bottom)//2)
     
     x = face_w * (point_w - cent_w) / (right - left)
     y = face_h * (point_h - cent_h) / (bottom - top)
     z = 1. * face_w / (right - left) * fx
 
+    x = x
+    y = y
+    z = z
+
     p0 = np.array([x, y, z])
     vec3d = gaze2vec3d(gaze)
     vec3d_e = np.hstack([vec3d, [1]]).reshape((4, -1))
     Rcf = compute_Rcf(x, y, z)
+    Rcf_inv = np.linalg.inv(Rcf)
     p1 = np.dot(Rcf, vec3d_e)[:3].reshape((-1))
+
+    print(p0, p1)
 
     xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) 
     yg = p0[1] - p0[2] / (p1[2]-p0[2]) * (p1[1]-p0[1]) 
 
-    gaze = np.array([xg, yg])
-    return gaze, p0
+    gaze_p = np.array([xg, yg])
+    face_p = p0
+
+    return gaze_p, face_p
 
 
 
@@ -80,6 +88,7 @@ if __name__ == '__main__':
     cap = cv2.VideoCapture(0)
 
     scale = 0.25
+    gaze = [0, 0]
 
     while(True):
         ret, frame = cap.read()

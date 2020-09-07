@@ -232,7 +232,7 @@ if __name__ == '__main__':
                                                        x_l: left_img[None, :],
                                                        x_r: rigt_img[None, :]})
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
-                print(gaze_p, face_p)
+                print(y_result[0], gaze_p, face_p)
 
                 cur_direction = face_utils.angle_to_direction(y_result[0])
 
