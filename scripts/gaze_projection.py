@@ -29,10 +29,10 @@ def gaze2vec3d(input_angle):
 
 def compute_Rcf(x, y, z):
     esp = 0.000001
-    sx = 0
-    cx = 1
-    sy = -x / ((z**2+x**2)**0.5+esp)
-    cy = -z / ((z**2+x**2)**0.5+esp)
+    sx = y / ((z**2+y**2)**0.5+esp)
+    cx = -z / ((z**2+y**2)**0.5+esp)
+    sy = x / ((z**2+x**2)**0.5+esp)
+    cy = z / ((z**2+x**2)**0.5+esp)
     sz = 0
     cz = 1
 
@@ -56,19 +56,16 @@ def gaze_to_screen(gaze, face, scale=0.25):
 
     point_w, point_h = ((left + right)//2, (top+bottom)//2)
     
-    x = face_w * (point_w - cent_w) / (right - left)
-    y = face_h * (point_h - cent_h) / (bottom - top)
+    x = 1. * face_w * (point_w - cent_w) / (right - left)
+    y = 1. * face_h * (point_h - cent_h) / (bottom - top)
     z = 1. * face_w / (right - left) * fx
 
-    x = x
-    y = y
-    z = z
 
     p0 = np.array([x, y, z])
     vec3d = gaze2vec3d(gaze)
     vec3d_e = np.hstack([vec3d, [1]]).reshape((4, -1))
     Rcf = compute_Rcf(x, y, z)
-    Rcf_inv = np.linalg.inv(Rcf)
+
     p1 = np.dot(Rcf, vec3d_e)[:3].reshape((-1))
 
     print(p0, p1)
@@ -76,6 +73,7 @@ def gaze_to_screen(gaze, face, scale=0.25):
     xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) 
     yg = p0[1] - p0[2] / (p1[2]-p0[2]) * (p1[1]-p0[1]) 
 
+    xg = -xg
     gaze_p = np.array([xg, yg])
     face_p = p0
 
@@ -102,8 +100,8 @@ if __name__ == '__main__':
         rects_small = detector(gray_small, 1)
 
         for face in rects_small:
-            gaze, p0 = gaze_to_screen(gaze, face, scale)
-            print(gaze)
+            gaze_p, p0 = gaze_to_screen(gaze, face, scale)
+            print(gaze_p)
             left = int(face.left() /scale)
             top = int(face.top() /scale)
             right = int(face.right()/scale)

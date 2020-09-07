@@ -78,6 +78,8 @@ while(True):
         # print(Rcf)
         p1 = np.dot(Rcf, vec3d_e)[:3].reshape((-1))
 
+        
+
         xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) 
         yg = p0[1] - p0[2] / (p1[2]-p0[2]) * (p1[1]-p0[1]) 
         print(xg, yg)
