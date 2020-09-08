@@ -12,7 +12,7 @@ use eye gaze to control the movements of a vehicle in ros
 
 
 ### Preparation
-- install tensorflow-gpu==1.14.0 (cuda-10.1, cudnn-7.6)
+- install tensorflow-gpu==1.14.0 (cuda-10.0, cudnn-7.4)
 - install python libs: `dlib`, `scipy`
 - Download the eye gaze [models](https://www.dropbox.com/sh/h23x33stlrhqvqq/AADn4iK7NMIc8bVnOkBpBBMSa?dl=0) and extract it to $ROOT_REPO
 
