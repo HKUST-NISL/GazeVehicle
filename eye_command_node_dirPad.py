@@ -28,6 +28,8 @@ import time
 import pyautogui
 import keyboard
 
+from gaze_projection import gaze_to_screen
+
 # parameters setting
 cap_region_x_begin=0.5  # start point/total width
 cap_region_y_end=0.8  # start point/total width
@@ -44,7 +46,16 @@ isBgCaptured = 0   # bool, whether the background captured
 triggerSwitch = False  # if true, keyborad simulator works
 skinkernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 
+# Dimensions of Isamu's laptop in centimeters
+XPS17_W = 37
+XPS17_H = 23
+resolution_H = 2400
+resolution_W = 3840
+res = (resolution_W, resolution_H)
 
+# pixel to physical size ratio (pixel/cm)
+pixelr_H = resolution_H / XPS17_H
+pixelr_W = resolution_W / XPS17_W
 
 # multithread code (I need this)
 class DrawingThread(Thread):
@@ -101,6 +112,22 @@ def is_moving(msg):
 
     return True
 
+def dwell_direction(x, y, resolution_H, resolution_W):
+    unit_x = resolution_W / 5
+    unit_y = resolution_H / 5
+
+    if (x < unit_x) and (y > unit_y) and (y < resolution_H - unit_y):
+        return "left"
+    
+    elif (x > unit_x) and (x < resolution_W - unit_x) and (y < resolution_H - unit_y):
+        return "backward"
+
+    elif (x > resolution_W - unit_x) and (y > unit_y) and (y < resolution_H - unit_y):
+        return "right"
+
+    else:
+        return "forward"
+
 def encode_msg(status, direction, spacekey, last_msg):
 
     if (status == 'open' or spacekey) and is_moving(last_msg):
@@ -116,72 +143,37 @@ def encode_msg(status, direction, spacekey, last_msg):
     msg.angular.y = 0
     msg.angular.z = 0
 
-    speed = 0.7 # originally 0.05
+    speed = 0.1 # originally 0.05
     ang_sped = 0.15
     cur_moving = False
 
 
     rospy.loginfo((spacekey, status, direction))
     
-    # centres are spaced by 50 pixels
-    """
-    pyautogui.FAILSAFE = False
-    pyautogui.moveTo(mouse_centreX, mouse_centreY)
-    """
     
     #=================================================================#
     #============= send move signals (to revert back) ================#
     #=================================================================#
 
     if (status == 'open' or spacekey) and direction == 'forward':
-        '''
-        pyautogui.moveTo(mouse_centreX, mouse_centreY - 50)
-        pyautogui.click()
-        print("A INVOKED")
-        '''
-        
-     
      
         msg.linear.x = speed
         cur_moving = True
-        # print("YEEEtttttttt")
-            
 
     elif (status == 'open' or spacekey) and direction == 'left':
-        '''
-        pyautogui.moveTo(mouse_centreX - 50, mouse_centreY)
-        pyautogui.click()
-        print("B INVOKED")
-        '''
 
         msg.angular.z = ang_sped
-
         cur_moving = True
-        # print("YEEEtttttttt")
 
     elif (status == 'open' or spacekey) and direction == 'right':
-        '''
-        pyautogui.moveTo(mouse_centreX * 50, mouse_centreY)
-        pyautogui.click()
-        print("C INVOKED")
-        '''
-
+    
         msg.angular.z = -ang_sped
-
         cur_moving = True 
-        # print("YEEEtttttttt")
 
     elif (status == 'open' or spacekey) and direction == 'backward':
-        '''
-        pyautogui.moveTo(mouse_centreX, mouse_centreY + 50)
-        pyautogui.click()
-        print("D INVOKED")
-        '''
-
-
+     
         msg.linear.x = -speed
         cur_moving = True
-        # print("YEEEtttttttt")
 
     else:
         print("excuseme, I'm w a i t i n g")
@@ -202,46 +194,30 @@ if __name__ == '__main__':
     
     get_input = True
 
-    root1 = tk.Tk()
-    root2 = tk.Tk()
-    root3 = tk.Tk()
-    root4 = tk.Tk()
+    root = tk.Tk()
 
-    root1.title("UP")
-    root2.title("DOWN")
-    root3.title("LEFT")
-    root4.title("RIGHT")
+    root.title("Direction Pad")
 
-    canvas1 = Canvas(root1, width=130, height=130, background='blue')
-    canvas2 = Canvas(root2, width=130, height=130, background='blue')
-    canvas3 = Canvas(root3, width=130, height=130, background='blue')
-    canvas4 = Canvas(root4, width=130, height=130, background='blue')
-    #canvas5 = Canvas(root, width=130, height=130, background='blue')
-
+    canvas1 = Canvas(root, width=130, height=130, background='blue')
+    canvas2 = Canvas(root, width=130, height=130, background='blue')
+    canvas3 = Canvas(root, width=130, height=130, background='blue')
+    canvas4 = Canvas(root, width=130, height=130, background='blue')
+    canvas5 = Canvas(root, width=130, height=130, background='blue')
+    canvas6 = Canvas(root, width=130, height=130, background='blue')
+    canvas7 = Canvas(root, width=130, height=130, background='blue')
+    canvas8 = Canvas(root, width=130, height=130, background='blue')
+    canvas9 = Canvas(root, width=130, height=130, background='blue')
     
-    #canvas6 = Canvas(root, width=130, height=130, background='blue')
-    #canvas7 = Canvas(root, width=130, height=130, background='blue')
-    #canvas8 = Canvas(root, width=130, height=130, background='blue')
-    #canvas9 = Canvas(root, width=130, height=130, background='blue')
-    
-    '''
-    canvas1.grid(row=0, column = 1)
-    canvas2.grid(row=2, column = 1)
-    canvas3.grid(row=1, column = 0)
-    canvas4.grid(row=1, column = 2)
+
+    canvas1.grid(row=0, column = 1) # UP tile
+    canvas2.grid(row=2, column = 1) # DOWN tile
+    canvas3.grid(row=1, column = 0) # LEFT tile
+    canvas4.grid(row=1, column = 2) # RIGHT tile
     canvas5.grid(row=1, column = 1)
-
-    
     canvas6.grid(row=0, column = 0)
     canvas7.grid(row=0, column = 2)
     canvas8.grid(row=2, column = 0)
     canvas9.grid(row=2, column = 2)
-    '''
-
-    canvas1.grid(row=0, column = 0)
-    canvas2.grid(row=0, column = 0)
-    canvas3.grid(row=0, column = 0)
-    canvas4.grid(row=0, column = 0)
 
     # =================================================================================== #
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -320,7 +296,7 @@ if __name__ == '__main__':
     video_capture.set(4, 1080)
 
     config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = 0.65
+    config.gpu_options.per_process_gpu_memory_fraction = 0.3
 
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
@@ -377,9 +353,20 @@ if __name__ == '__main__':
                                                     x_f: face_img[None, :],
                                                     x_l: left_img[None, :],
                                                     x_r: rigt_img[None, :]})
+                
+                gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
+                print(y_result[0], gaze_p, face_p)
 
-                cur_direction = face_utils.angle_to_direction(y_result[0])
+                mock_direction = dwell_direction((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
+                print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
+                X = (gaze_p[0] + XPS17_W / 2) * pixelr_W
+                Y = gaze_p[1] * pixelr_H 
 
+
+                # PREVIOUS METHOD
+                # cur_direction = face_utils.angle_to_direction(y_result[0])
+                cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
+                print("THE DIRECTION IS: ", cur_direction)
                 print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
                 break
@@ -410,50 +397,48 @@ if __name__ == '__main__':
             #============= setting up the buttons for the thread =============#
             #=================================================================#
 
-            
-
             # UP
-            if status == 'open' and get_input and direction == "forward" :
+            if (status == 'open' or spacekey) and get_input and direction == "forward" :
                
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = False
+                get_input = True
 
 
             # DOWN
-            elif status == 'open' and get_input and direction == "backward":
+            elif (status == 'open' or spacekey) and get_input and direction == "backward":
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
                 canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = False
+                get_input = True
                 
 
             # LEFT
-            elif status == 'open' and get_input and direction == "left":
+            elif (status == 'open' or spacekey) and get_input and direction == "left":
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
                 canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = False
+                get_input = True
 
 
             # RIGHT
-            elif status == 'open' and get_input and direction == "right":
+            elif (status == 'open' or spacekey) and get_input and direction == "right":
 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                get_input = False
+                get_input = True
 
 
             # STOP
-            elif status != 'open':
+            elif (status != 'open') or (not spacekey):
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
@@ -494,15 +479,7 @@ if __name__ == '__main__':
                     canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
                     canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
 
-            
-            root1.update_idletasks()
-            root1.update()
+            root.update_idletasks()
+            root.update()
 
-            root2.update_idletasks()
-            root2.update()
-
-            root3.update_idletasks()
-            root3.update()
-
-            root4.update_idletasks()
-            root4.update()
+        
