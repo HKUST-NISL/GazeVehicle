@@ -24,38 +24,31 @@ cd $ROOT_REPO
 catkin_make
 ```
 
+### Launch
+```
+source devel/setup.bash
+roslauncl launch/one_of_the_files.launch
+```
+
 ### Demo
 
 1. Show robot in gazebo simulator
 <div align=center><img src="./asserts/bot_gazebo.png" width="800" height="450" ></div>
 
-```
-cd $ROOT_REPO
-# show robot in gazebo
-source ./devel/setup.bash
-roslaunch mybot_gazebo mybot_world.launch
-```
 
 2. Show image obtained by the camera on the robot
 
 <div align=center><img src="./asserts/bot_camera.png" width="800" height="450" ></div>
 
-```
-# show image from the robot camera
-rosrun image_view image_view image:=/mybot/camera1/image_raw
-```
+
 
 3. Analyze mouth status and estimate eye gaze to control the robot
 
-   - Eye gaze is to control the moving direction. 
-      - look down to move backword
-   - Start moving by open your mouth or push space key
+   - Use keys as commands
+   - Use gaze as direction and a space key as a moving command
+   - Use gaze dewll to push the command buttons
 
-```
-# use mouth and eyes to send the comand
-source ./devel/setup.bash
-python scripts/eye_command_node.py
-```
+
 
 ### Cite
 This repo's model is from the paper below:
