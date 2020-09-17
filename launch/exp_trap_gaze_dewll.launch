@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node name="image_view" pkg="image_view" type="image_view" output="screen" >
+    <remap from="image" to="/mybot/camera1/image_raw" />
+  </node> 
+
+  <include file="$(find mybot_gazebo)/launch/world_trap.launch" />
+
+  <include file="$(find interfaces)/launch/gaze_dwell.launch" />
+
+</launch>
