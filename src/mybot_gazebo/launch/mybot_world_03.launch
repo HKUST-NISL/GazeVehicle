@@ -12,7 +12,7 @@
   <arg name="Y_pos" default="10"/>
   
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find mybot_gazebo)/worlds/myworldObstacle.world"/>
+    <arg name="world_name" value="$(find mybot_gazebo)/worlds/no_trap.world"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="gui" value="$(arg gui)"/>

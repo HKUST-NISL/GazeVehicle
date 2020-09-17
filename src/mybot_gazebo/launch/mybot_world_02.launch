@@ -7,12 +7,12 @@
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
-  <arg name="x_pos" default="0.5"/>
-  <arg name="y_pos" default="0.5"/>
-  <arg name="Y_pos" default="1.57"/>
+  <arg name="x_pos" default="2.546"/>
+  <arg name="y_pos" default="0.033"/>
+  <arg name="Y_pos" default="10"/>
   
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find mybot_gazebo)/worlds/test_world_trap.world"/>
+    <arg name="world_name" value="$(find mybot_gazebo)/worlds/no_detour.world"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
     <arg name="gui" value="$(arg gui)"/>
