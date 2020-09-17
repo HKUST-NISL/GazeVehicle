@@ -8,6 +8,6 @@
 
   <include file="$(find mybot_gazebo)/launch/world_obstacle.launch" />
 
-  <include file="$(find interfaces)/launch/geze_key.launch" />
+  <include file="$(find interfaces)/launch/gaze_key.launch" />
 
 </launch>
