@@ -1,3 +1,4 @@
+#! /usr/bin/python
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,15 +9,15 @@ import sys
 import rospy
 import tensorflow as tf
 
-from eye_model import dilatedNet
+from utils.eye_model import dilatedNet
 
 import cv2
 import numpy as np
 import dlib
 import scipy.io as spio
 
-import face_utils
-import preprocess_eye as pre_eye
+from utils import face_utils
+import utils.preprocess_eye as pre_eye
 
 from Tkinter import *
 import tkMessageBox
@@ -29,7 +30,7 @@ import pyautogui
 import keyboard
 
 
-from gaze_projection import gaze_to_screen
+from utils.gaze_projection import gaze_to_screen
 
 # Dimensions of Isamu's laptop in centimeters
 XPS17_W = 37
@@ -161,27 +162,27 @@ def encode_msg(status, direction, spacekey, last_msg):
     #============= send move signals (to revert back) ================#
     #=================================================================#
 
-    if (status == 'open' or spacekey) and direction == 'forward':
+    if direction == 'forward':
      
         msg.linear.x = speed
         cur_moving = True
         # print("YEEEtttttttt")
             
 
-    elif (status == 'open' or spacekey) and direction == 'left':
+    elif direction == 'left':
        
         msg.angular.z = ang_sped
         cur_moving = True
         # print("YEEEtttttttt")
 
-    elif (status == 'open' or spacekey) and direction == 'right':
+    elif direction == 'right':
 
         msg.angular.z = -ang_sped
 
         cur_moving = True 
         # print("YEEEtttttttt")
 
-    elif (status == 'open' or spacekey) and direction == 'backward':
+    elif direction == 'backward':
 
         msg.linear.x = -speed
         cur_moving = True
@@ -230,6 +231,11 @@ if __name__ == '__main__':
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
+
+    import rospkg
+
+    rospack = rospkg.RosPack()
+    model_dir = rospack.get_path('interfaces')
     
     print('Starting...')
     
@@ -237,19 +243,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--vgg_dir', type=str,
-                        default='./models/vgg16_weights.npz',
+                        default=model_dir+'/../../models/vgg16_weights.npz',
                         help='Directory for pretrained vgg16')
     
     parser.add_argument("--shape-predictor", type=str,
-                        default='./models/shape_predictor_68_face_landmarks.dat',
+                        default=model_dir+'/../../models/shape_predictor_68_face_landmarks.dat',
                             help="Path to facial landmark predictor")
     
     parser.add_argument("--camera_mat", type=str,
-                        default='./models/camera_matrix.mat',
+                        default=model_dir+'/../../models/camera_matrix.mat',
                             help="Path to camera matrix")
 
     parser.add_argument("--gaze_model", type=str,
-                        default='./models/model21.ckpt',
+                        default=model_dir+'/../../models/model21.ckpt',
                             help="Path to eye gaze model")
 
     parser.add_argument("--camera_ind", type=str,
@@ -314,6 +320,10 @@ if __name__ == '__main__':
         status = None
         direction = None
         spacekey = False
+        upkey = False
+        downkey = False
+        leftkey = False
+        rightkey = False
         last_msg = None
 
 
@@ -370,7 +380,7 @@ if __name__ == '__main__':
                 Y = gaze_p[1] * pixelr_H 
 
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
-                cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
+                # cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
 
                 print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
@@ -382,13 +392,58 @@ if __name__ == '__main__':
             cv2.imshow("rigt_img", rigt_img)
             c = cv2.waitKey(10)
             
-            if c == 32:
-                spacekey = (not spacekey)
+            if c == 82:
+                upkey = (not upkey)
 
-            rospy.loginfo(spacekey)
+            elif c == 84:
+                downkey = (not downkey)
 
+            elif c == 81:
+                leftkey = (not leftkey)
+
+            elif c == 83:
+                rightkey = (not rightkey)
+            
+            if upkey:
+                direction = "forward"
+                downkey = False
+                leftkey = False
+                rightkey = False
+            
+            elif rightkey:
+                direction = "right"
+                downkey = False
+                leftkey = False
+                upkey = False
+
+            elif leftkey:
+                direction = "left"
+                downkey = False
+                upkey = False
+                rightkey = False
+
+            elif downkey:
+                direction = "down"
+                upkey = False
+                leftkey = False
+                rightkey = False
+
+            else:
+                direction = "stop"
+                upkey = False
+                leftkey = False
+                rightkey = False
+                downkey = False
+
+         
+
+            rospy.loginfo(upkey)
+            rospy.loginfo(downkey)
+            rospy.loginfo(leftkey)
+            rospy.loginfo(rightkey)
+            
             status = cur_status
-            direction = cur_direction
+            # direction = cur_direction
 
             
 
@@ -404,7 +459,7 @@ if __name__ == '__main__':
             
 
             # UP
-            if spacekey and get_input and direction == "forward" :
+            if get_input and upkey :
                
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
@@ -414,7 +469,7 @@ if __name__ == '__main__':
 
 
             # DOWN
-            elif spacekey and get_input and direction == "backward":
+            elif get_input and downkey:
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
@@ -424,7 +479,7 @@ if __name__ == '__main__':
                 
 
             # LEFT
-            elif spacekey and get_input and direction == "left":
+            elif get_input and leftkey:
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
@@ -434,7 +489,7 @@ if __name__ == '__main__':
 
 
             # RIGHT
-            elif spacekey and get_input and direction == "right":
+            elif get_input and rightkey:
 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
@@ -444,7 +499,7 @@ if __name__ == '__main__':
 
 
             # STOP
-            elif not spacekey or direction == "stop":
+            else:
                 
                 canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
                 canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
@@ -452,39 +507,7 @@ if __name__ == '__main__':
                 canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
                 get_input = True
 
-                if direction == "forward" :
-               
-                    canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                    canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-
-
-                # DOWN
-                elif direction == "backward":
-                    
-                    canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                    canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-
-                # LEFT
-                elif direction == "left":
-                    
-                    canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                    canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-
-
-                # RIGHT
-                elif direction == "right":
-
-                    canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                    canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-
+            
             
             root1.update_idletasks()
             root1.update()

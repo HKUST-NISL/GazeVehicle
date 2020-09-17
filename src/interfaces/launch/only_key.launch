@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="interfaces" type="only_key.py" name="interface_only_key" output="screen" />
+
+</launch>

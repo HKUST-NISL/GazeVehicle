@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="interfaces" type="gaze_key.py" name="interface_gaze_key" output="screen" />
+
+</launch>
