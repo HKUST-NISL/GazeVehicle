@@ -150,7 +150,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     cur_moving = False
 
 
-    rospy.loginfo((spacekey, status, direction))
+    # rospy.loginfo((spacekey, status, direction))
     
     # centres are spaced by 50 pixels
     """
@@ -189,9 +189,10 @@ def encode_msg(status, direction, spacekey, last_msg):
         # print("YEEEtttttttt")
 
     else:
-        print("excuseme, I'm w a i t i n g")
+        # print("excuseme, I'm w a i t i n g")
+        pass
 
-    rospy.loginfo(msg)
+    # rospy.loginfo(msg)
     
     return msg
 
@@ -362,6 +363,11 @@ if __name__ == '__main__':
                 for i, (x, y) in enumerate(shape):
                     cv2.circle(frame_small, (int(x*scale), int(y*scale)), 1, (0, 0, 255), -1)
 
+                if face_img.shape[0] != 96 or face_img.shape[1] != 96 or \
+                    left_img.shape[0] != 64 or left_img.shape[1] != 96 or \
+                    rigt_img.shape[0] != 64 or rigt_img.shape[1] != 96 :
+                    break
+
                 # eye gaze estimation
                 face_img, left_img, rigt_img, eye_lm, fc_c_world = \
                     pre_eye.WarpNCrop(frame[:,:,::-1], shape, inv_cameraMat, cam_new)
@@ -372,24 +378,23 @@ if __name__ == '__main__':
                                                     x_r: rigt_img[None, :]})
 
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
-                print(y_result[0], gaze_p, face_p)
 
                 mock_direction = dwell_direction((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
-                print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
+                # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
                 X = (gaze_p[0] + XPS17_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
 
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
                 # cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
 
-                print('mouth: %s eye: %s' % (cur_status, cur_direction))
+                # print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
                 break
             
             cv2.imshow("frame", frame_small)
-            cv2.imshow("face_img", face_img)
-            cv2.imshow("left_img", left_img)
-            cv2.imshow("rigt_img", rigt_img)
+            # cv2.imshow("face_img", face_img)
+            # cv2.imshow("left_img", left_img)
+            # cv2.imshow("rigt_img", rigt_img)
             c = cv2.waitKey(10)
             
             if c == 82:
@@ -437,10 +442,10 @@ if __name__ == '__main__':
 
          
 
-            rospy.loginfo(upkey)
-            rospy.loginfo(downkey)
-            rospy.loginfo(leftkey)
-            rospy.loginfo(rightkey)
+            # rospy.loginfo(upkey)
+            # rospy.loginfo(downkey)
+            # rospy.loginfo(leftkey)
+            # rospy.loginfo(rightkey)
             
             status = cur_status
             # direction = cur_direction

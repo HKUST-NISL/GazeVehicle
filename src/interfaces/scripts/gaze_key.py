@@ -7,8 +7,6 @@ from __future__ import print_function
 import argparse
 import sys
 import os
-cwd = os.getcwd()
-print(cwd)
 
 import rospy
 import tensorflow as tf
@@ -154,7 +152,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     cur_moving = False
 
 
-    rospy.loginfo((spacekey, status, direction))
+    # rospy.loginfo((spacekey, status, direction))
     
     # centres are spaced by 50 pixels
     """
@@ -193,9 +191,10 @@ def encode_msg(status, direction, spacekey, last_msg):
         # print("YEEEtttttttt")
 
     else:
-        print("excuseme, I'm w a i t i n g")
+        # print("excuseme, I'm w a i t i n g")
+        pass
 
-    rospy.loginfo(msg)
+    # rospy.loginfo(msg)
     
     return msg
 
@@ -365,6 +364,11 @@ if __name__ == '__main__':
                 # eye gaze estimation
                 face_img, left_img, rigt_img, eye_lm, fc_c_world = \
                     pre_eye.WarpNCrop(frame[:,:,::-1], shape, inv_cameraMat, cam_new)
+                
+                if face_img.shape[0] != 96 or face_img.shape[1] != 96 or \
+                    left_img.shape[0] != 64 or left_img.shape[1] != 96 or \
+                    rigt_img.shape[0] != 64 or rigt_img.shape[1] != 96 :
+                    break
 
                 y_result, eye_tensor, face_tensor = sess.run([y_conv, h_trans, face_h_trans], feed_dict={
                                                     x_f: face_img[None, :],
@@ -372,17 +376,17 @@ if __name__ == '__main__':
                                                     x_r: rigt_img[None, :]})
 
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
-                print(y_result[0], gaze_p, face_p)
+
 
                 mock_direction = dwell_direction((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
-                print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
+                # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
                 X = (gaze_p[0] + XPS17_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
 
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
                 cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
 
-                print('mouth: %s eye: %s' % (cur_status, cur_direction))
+                # print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
                 break
             
@@ -395,7 +399,7 @@ if __name__ == '__main__':
             if c == 32:
                 spacekey = (not spacekey)
 
-            rospy.loginfo(spacekey)
+            # rospy.loginfo(spacekey)
 
             status = cur_status
             direction = cur_direction

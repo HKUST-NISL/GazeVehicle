@@ -68,8 +68,6 @@ def gaze_to_screen(gaze, face, scale=0.25):
 
     p1 = np.dot(Rcf, vec3d_e)[:3].reshape((-1))
 
-    print(p0, p1)
-
     xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) 
     yg = p0[1] - p0[2] / (p1[2]-p0[2]) * (p1[1]-p0[1]) 
 
