@@ -27,7 +27,7 @@ catkin_make
 ### Launch
 ```
 source devel/setup.bash
-roslauncl launch/one_of_the_files.launch
+roslaunch launch/one_of_the_files.launch
 ```
 
 ### Demo
