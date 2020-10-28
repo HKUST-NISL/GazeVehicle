@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node pkg="interfaces" type="virtual_key.py" name="interface_virtual_key" output="screen" />
+
+</launch>
