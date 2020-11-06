@@ -1,3 +1,4 @@
+#! /usr/bin/python
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,15 +9,15 @@ import sys
 import rospy
 import tensorflow as tf
 
-from eye_model import dilatedNet
+from utils.eye_model import dilatedNet
 
 import cv2
 import numpy as np
 import dlib
 import scipy.io as spio
 
-import face_utils
-import preprocess_eye as pre_eye
+from utils import face_utils
+import utils.preprocess_eye as pre_eye
 
 from Tkinter import *
 import tkMessageBox
@@ -28,10 +29,7 @@ import time
 import pyautogui
 import keyboard
 
-
-from gaze_projection import gaze_to_screen
-
-
+from utils.gaze_projection import gaze_to_screen
 
 # Dimensions of Isamu's laptop in centimeters
 XPS17_W = 37
@@ -312,7 +310,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     cur_moving = False
 
 
-    rospy.loginfo((spacekey, status, direction))
+    # rospy.loginfo((spacekey, status, direction))
     
     # centres are spaced by 50 pixels
     """
@@ -350,10 +348,11 @@ def encode_msg(status, direction, spacekey, last_msg):
         print("YEEEtttttttt")
 
     else:
-        print("excuseme, I'm w a i t i n g")
-        print("DIR: ", DIRECTION)
+        # print("excuseme, I'm w a i t i n g")
+        # print("DIR: ", DIRECTION)
+        pass
 
-    rospy.loginfo(msg)
+    # rospy.loginfo(msg)
     
     return msg
 
@@ -376,6 +375,11 @@ if __name__ == '__main__':
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
+
+    import rospkg
+
+    rospack = rospkg.RosPack()
+    model_dir = rospack.get_path('interfaces')
     
     print('Starting...')
     
@@ -383,19 +387,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--vgg_dir', type=str,
-                        default='./models/vgg16_weights.npz',
+                        default=model_dir+'/../../models/vgg16_weights.npz',
                         help='Directory for pretrained vgg16')
     
     parser.add_argument("--shape-predictor", type=str,
-                        default='./models/shape_predictor_68_face_landmarks.dat',
+                        default=model_dir+'/../../models/shape_predictor_68_face_landmarks.dat',
                             help="Path to facial landmark predictor")
     
     parser.add_argument("--camera_mat", type=str,
-                        default='./models/camera_matrix.mat',
+                        default=model_dir+'/../../models/camera_matrix.mat',
                             help="Path to camera matrix")
 
     parser.add_argument("--gaze_model", type=str,
-                        default='./models/model21.ckpt',
+                        default=model_dir+'/../../models/model21.ckpt',
                             help="Path to eye gaze model")
 
     parser.add_argument("--camera_ind", type=str,
@@ -508,7 +512,7 @@ if __name__ == '__main__':
                                                     x_r: rigt_img[None, :]})
 
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
-                print(y_result[0], gaze_p, face_p)
+                # print(y_result[0], gaze_p, face_p)
 
                 X = (gaze_p[0] + XPS17_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
@@ -516,8 +520,8 @@ if __name__ == '__main__':
                 pyautogui.moveTo(X, Y, duration = 0.0, _pause=False)
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
                 cur_direction = dwell_direction(DIRECTION, resolution_H, resolution_W)
-                print("WHAT IS IT: ", DIRECTION)
-                print('mouth: %s eye: %s' % (cur_status, cur_direction))
+                # print("WHAT IS IT: ", DIRECTION)
+                # print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
                     
                 break
@@ -526,6 +530,7 @@ if __name__ == '__main__':
             cv2.imshow("face_img", face_img)
             cv2.imshow("left_img", left_img)
             cv2.imshow("rigt_img", rigt_img)
+            cv2.waitKey(10)
             
 
             status = cur_status
