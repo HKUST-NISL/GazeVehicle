@@ -32,10 +32,20 @@ import keyboard
 from utils.gaze_projection import gaze_to_screen
 
 # Dimensions of Isamu's laptop in centimeters
-XPS17_W = 37
-XPS17_H = 23
-resolution_H = 2400
-resolution_W = 3840
+
+# xps 17
+# XPS17_W = 37.0
+# XPS17_H = 23.0
+# resolution_H = 2400
+# resolution_W = 3840
+
+# hd monitor
+XPS17_W = 34.5
+XPS17_H = 19.8
+resolution_H = 1080
+resolution_W = 1920
+
+
 res = (resolution_W, resolution_H)
 
 # pixel to physical size ratio (pixel/cm)
@@ -313,10 +323,10 @@ def encode_msg(status, direction, spacekey, last_msg):
     # rospy.loginfo((spacekey, status, direction))
     
     # centres are spaced by 50 pixels
-    """
+    #"""
     pyautogui.FAILSAFE = False
-    pyautogui.moveTo(mouse_centreX, mouse_centreY)
-    """
+    # pyautogui.moveTo(mouse_centreX, mouse_centreY)
+    #"""
     
     #=================================================================#
     #============= send move signals (to revert back) ================#
@@ -527,10 +537,10 @@ if __name__ == '__main__':
                 break
             
             cv2.imshow("frame", frame_small)
-            cv2.imshow("face_img", face_img)
-            cv2.imshow("left_img", left_img)
-            cv2.imshow("rigt_img", rigt_img)
-            cv2.waitKey(10)
+            # cv2.imshow("face_img", face_img)
+            # cv2.imshow("left_img", left_img)
+            # cv2.imshow("rigt_img", rigt_img)
+            cv2.waitKey(1)
             
 
             status = cur_status

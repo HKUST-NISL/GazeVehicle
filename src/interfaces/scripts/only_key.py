@@ -33,10 +33,17 @@ import keyboard
 from utils.gaze_projection import gaze_to_screen
 
 # Dimensions of Isamu's laptop in centimeters
-XPS17_W = 37
-XPS17_H = 23
-resolution_H = 2400
-resolution_W = 3840
+# xps 17
+# XPS17_W = 37.0
+# XPS17_H = 23.0
+# resolution_H = 2400
+# resolution_W = 3840
+
+# hd monitor
+XPS17_W = 34.5
+XPS17_H = 19.8
+resolution_H = 1080
+resolution_W = 1920
 res = (resolution_W, resolution_H)
 
 # pixel to physical size ratio (pixel/cm)
