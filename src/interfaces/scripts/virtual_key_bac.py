@@ -134,155 +134,59 @@ class ClickThread(Thread):
         rospy.loginfo(spacekey)
 '''
 
-class DrawingThread(Thread):
+def point_in_rect(X, Y, rect):
+
+    if X > rect[0][0] and X < rect[1][0] and Y > rect[0][1] and Y < rect[1][1]:
+        return True
+    
+    return False
+
+def draw_virtual_key(img_key,X, Y,cut_rate=0.25):
+
+    img_key[...] = 255
+
+    left_rect = ((0, 0), (int(resolution_W*cut_rate), resolution_H))
+    right_rect = ((int(resolution_W*(1-cut_rate)), 0), (resolution_W, resolution_H))
+    forward_rect = ((int(resolution_W*cut_rate), 0), (int(resolution_W*(1-cut_rate)), int(resolution_H*cut_rate)))
+    back_rect = ((int(resolution_W*cut_rate), int(resolution_H*(1-cut_rate))), (int(resolution_W*(1-cut_rate)), resolution_H))
+
+    key_color = (0, 255, 0)
+    active_color = (255, 0, 0)
+    gaze_color = (0, 255, 255)
+
+    cv2.rectangle(img_key, left_rect[0], left_rect[1], key_color, -1)
+    cv2.rectangle(img_key, right_rect[0], right_rect[1], key_color, -1)
+    cv2.rectangle(img_key, forward_rect[0], forward_rect[1], key_color, -1)
+    cv2.rectangle(img_key, back_rect[0], back_rect[1], key_color, -1)
+
+    active_rect = None
+    direction = 'stop'
+
+    if point_in_rect(X, Y, forward_rect):
+        active_rect = forward_rect
+        direction = 'forward'
+    elif point_in_rect(X, Y, left_rect):
+        active_rect = left_rect
+        direction = 'left'
+    elif point_in_rect(X, Y, right_rect):
+        active_rect = right_rect
+        direction = 'right'
+    elif point_in_rect(X, Y, back_rect):
+        active_rect = back_rect
+        direction = 'backward'
+
+    if active_rect is not None:
+        cv2.rectangle(img_key, active_rect[0], active_rect[1], active_color, -1)
 
 
-    def run(self):
+    cv2.line(img_key, (int(resolution_W*cut_rate),0), (int(resolution_W*cut_rate), resolution_H), (0, 0, 0), 4)
+    cv2.line(img_key, (int(resolution_W*(1-cut_rate)),0), (int(resolution_W*(1-cut_rate)), resolution_H), (0, 0, 0), 4)
+    cv2.line(img_key, (int(resolution_W*cut_rate), int(resolution_H*cut_rate)), (int(resolution_W*(1-cut_rate)), int(resolution_H*cut_rate)), (0, 0, 0), 4)
+    cv2.line(img_key, (int(resolution_W*cut_rate), int(resolution_H*(1-cut_rate))), (int(resolution_W*(1-cut_rate)), int(resolution_H*(1-cut_rate))), (0, 0, 0), 4)
 
-        #=================================================================#
-        #============= setting up the buttons for the thread =============#
-        #=================================================================#
-        window = Tk()
-
-        # UP BUTTONS
-        button = Button(window,text='UP',width=20, height=2)
-        button.config(font=('Ink Free',50,'bold'))
-        button.config(bg='#ff6200')
-        button.config(fg='#fffb1f')
-        button.config(activebackground='#FF0000')
-        button.config(activeforeground='#fffb1f')
-        button.grid(row=0, column=1)
-
-        button.bind( "<Button>", UP )   
-        button.bind( "<ButtonRelease-1>", STOP )   
-
-        button10 = Button(window,width=20, height=2)
-        button10.config(font=('Ink Free',50,'bold'))
-        button10.config(bg='#ff6200')
-        button10.config(fg='#fffb1f')
-        button10.config(activebackground='#FF0000')
-        button10.config(activeforeground='#fffb1f')
-        button10.grid(row=1, column=1)
-
-        button10.bind( "<Button>", UP )   
-        button10.bind( "<ButtonRelease-1>", STOP )   
-
-        # DOWN BUTTONS
-        button9 = Button(window,text='DOWN',width=20, height=2)
-        button9.config(font=('Ink Free',50,'bold'))
-        button9.config(bg='#FF0000')
-        button9.config(fg='#fffb1f')
-        button9.config(activebackground='#FF0000')
-        button9.config(activeforeground='#fffb1f')
-        button9.grid(row=3, column=1)
-
-        button9.bind( "<Button>", DOWN )  
-        button9.bind( "<ButtonRelease-1>", STOP )    
-
-        button8 = Button(window,width=20, height=2)
-        button8.config(font=('Ink Free',50,'bold'))
-        button8.config(bg='#FF0000')
-        button8.config(fg='#fffb1f')
-        button8.config(activebackground='#FF0000')
-        button8.config(activeforeground='#fffb1f')
-        button8.grid(row=2, column=1)
-
-        button8.bind( "<Button>", DOWN )   
-        button8.bind( "<ButtonRelease-1>", STOP )   
-
-        # RIGHT BUTTONS
-        button2 = Button(window,text='RIGHT',width=10, height=2)
-        button2.config(font=('Ink Free',50,'bold'))
-        button2.config(bg='#ff8280')
-        button2.config(fg='#fffb1f')
-        button2.config(activebackground='#FF0000')
-        button2.config(activeforeground='#fffb1f')
-        button2.grid(row=1, column=2)
-
-        button2.bind( "<Button>", RIGHT ) 
-        button2.bind( "<ButtonRelease-1>", STOP )     
-
-        button4 = Button(window,width=10, height=2)
-        button4.config(font=('Ink Free',50,'bold'))
-        button4.config(bg='#ff8280')
-        button4.config(fg='#fffb1f')
-        button4.config(activebackground='#FF0000')
-        button4.config(activeforeground='#fffb1f')
-        button4.grid(row=0, column=2)
-
-        button4.bind( "<Button>", RIGHT ) 
-        button4.bind( "<ButtonRelease-1>", STOP )     
-
-        button7 = Button(window,width=10, height=2)
-        button7.config(font=('Ink Free',50,'bold'))
-        button7.config(bg='#ff8280')
-        button7.config(fg='#fffb1f')
-        button7.config(activebackground='#FF0000')
-        button7.config(activeforeground='#fffb1f')
-        button7.grid(row=2, column=2)
-
-        button7.bind( "<Button>", RIGHT )  
-        button7.bind( "<ButtonRelease-1>", STOP )    
-
-        button12 = Button(window,width=10, height=2)
-        button12.config(font=('Ink Free',50,'bold'))
-        button12.config(bg='#ff8280')
-        button12.config(fg='#fffb1f')
-        button12.config(activebackground='#FF0000')
-        button12.config(activeforeground='#fffb1f')
-        button12.grid(row=3, column=2)
-
-        button12.bind( "<Button>", RIGHT )  
-        button12.bind( "<ButtonRelease-1>", STOP )    
-
-        # LEFT BUTTONS
-        button3 = Button(window,text='LEFT',width=10, height=2)
-        button3.config(font=('Ink Free',50,'bold'))
-        button3.config(bg='#ff8280')
-        button3.config(fg='#fffb1f')
-        button3.config(activebackground='#FF0000')
-        button3.config(activeforeground='#fffb1f')
-        button3.grid(row=1, column=0)
-
-        button3.bind( "<Button>", LEFT ) 
-        button3.bind( "<ButtonRelease-1>", STOP )     
-
-        button5 = Button(window,width=10, height=2)
-        button5.config(font=('Ink Free',50,'bold'))
-        button5.config(bg='#ff8280')
-        button5.config(fg='#fffb1f')
-        button5.config(activebackground='#FF0000')
-        button5.config(activeforeground='#fffb1f')
-        button5.grid(row=0, column=0)
-
-        button5.bind( "<Button>", LEFT ) 
-        button5.bind( "<ButtonRelease-1>", STOP )     
-
-        button6 = Button(window,width=10, height=2)
-        button6.config(font=('Ink Free',50,'bold'))
-        button6.config(bg='#ff8280')
-        button6.config(fg='#fffb1f')
-        button6.config(activebackground='#FF0000')
-        button6.config(activeforeground='#fffb1f')
-        button6.grid(row=2, column=0)
-
-        button6.bind( "<Button>", LEFT )  
-        button6.bind( "<ButtonRelease-1>", STOP )    
-
-        button14 = Button(window,width=10, height=2)
-        button14.config(font=('Ink Free',50,'bold'))
-        button14.config(bg='#ff8280')
-        button14.config(fg='#fffb1f')
-        button14.config(activebackground='#FF0000')
-        button14.config(activeforeground='#fffb1f')
-        button14.grid(row=3, column=0)
-
-        button14.bind( "<Button>", LEFT )   
-        button14.bind( "<ButtonRelease-1>", STOP )   
-
-
-        window.mainloop()
-        
+    cv2.circle(img_key, (int(X), int(Y)), 9, (0, 0, 255), -1)
+    
+    return img_key, direction
             
   
 def is_moving(msg):
@@ -332,30 +236,24 @@ def encode_msg(status, direction, spacekey, last_msg):
     #============= send move signals (to revert back) ================#
     #=================================================================#
 
-    if direction == 'forward':
-     
+    if (status == 'open' or spacekey) and direction == 'forward':
         msg.linear.x = speed
         cur_moving = True
-        print("YEEEtttttttt")
             
-
-    elif direction == 'left':
+    elif (status == 'open' or spacekey) and direction == 'left':
        
         msg.angular.z = ang_sped
         cur_moving = True
-        print("YEEEtttttttt")
 
-    elif direction == 'right':
+    elif (status == 'open' or spacekey) and direction == 'right':
 
         msg.angular.z = -ang_sped
         cur_moving = True 
-        print("YEEEtttttttt")
 
-    elif direction == 'backward':
+    elif (status == 'open' or spacekey) and direction == 'backward':
 
         msg.linear.x = -speed
         cur_moving = True
-        print("YEEEtttttttt")
 
     else:
         # print("excuseme, I'm w a i t i n g")
@@ -369,17 +267,9 @@ def encode_msg(status, direction, spacekey, last_msg):
 
 
 if __name__ == '__main__':
-    print("start GUI")
-   
-    gui_thread = DrawingThread()
-    #clk_thread = ClickThread()
+    print("start Virtual Key")
 
-    # start the drawing thread
-    gui_thread.start()
-    #clk_thread.start()
-    
     get_input = True
-
     
     # =================================================================================== #
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -486,6 +376,9 @@ if __name__ == '__main__':
 
             rects_small = detector(gray_small, 1)
 
+            # virtual key
+            img_key = np.zeros((resolution_W, resolution_W, 3), np.uint8)
+
             face_img = np.zeros((64, 96)).astype(np.uint8)
             left_img = np.zeros((64, 96)).astype(np.uint8)
             rigt_img = np.zeros((64, 96)).astype(np.uint8)
@@ -527,12 +420,13 @@ if __name__ == '__main__':
                 X = (gaze_p[0] + SCREEN_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
 
-                pyautogui.moveTo(X, Y, duration = 0.0, _pause=False)
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
-                cur_direction = dwell_direction(DIRECTION, resolution_H, resolution_W)
+                # cur_direction = dwell_direction(DIRECTION, resolution_H, resolution_W)
                 # print("WHAT IS IT: ", DIRECTION)
                 # print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
+                
+                img_key, cur_direction = draw_virtual_key(img_key, X, Y, cut_rate=0.25)
                     
                 break
             
@@ -540,14 +434,17 @@ if __name__ == '__main__':
             # cv2.imshow("face_img", face_img)
             # cv2.imshow("left_img", left_img)
             # cv2.imshow("rigt_img", rigt_img)
-            cv2.waitKey(1)
+            cv2.imshow('virtual key', img_key)
+            c = cv2.waitKey(10)
+
+            if c == 32:
+                spacekey = (not spacekey)
             
 
             status = cur_status
             direction = cur_direction
 
-            
-
+        
             msg = encode_msg(status, direction, spacekey, last_msg)
             last_msg = msg
             pub.publish(msg)
