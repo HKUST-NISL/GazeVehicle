@@ -136,7 +136,7 @@ def is_moving(msg):
         msg.angular.y == 0 and \
         msg.angular.z == 0:
         return False
-        
+
     return True
 
 def encode_msg(status, direction, spacekey, last_msg):
@@ -159,7 +159,7 @@ def encode_msg(status, direction, spacekey, last_msg):
     cur_moving = False
 
 
-    rospy.loginfo((spacekey, status, direction))
+    # rospy.loginfo((spacekey, status, direction))
     
     # centres are spaced by 50 pixels
     """
