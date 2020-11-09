@@ -34,21 +34,21 @@ from utils.gaze_projection import gaze_to_screen
 
 # Dimensions of Isamu's laptop in centimeters
 # xps 17
-# XPS17_W = 37.0
-# XPS17_H = 23.0
+# SCREEN_W = 37.0
+# SCREEN_H = 23.0
 # resolution_H = 2400
 # resolution_W = 3840
 
 # hd monitor
-XPS17_W = 34.5
-XPS17_H = 19.8
+SCREEN_W = 34.5
+SCREEN_H = 19.8
 resolution_H = 1080
 resolution_W = 1920
 res = (resolution_W, resolution_H)
 
 # pixel to physical size ratio (pixel/cm)
-pixelr_H = 1.0 * resolution_H / XPS17_H
-pixelr_W = 1.0 * resolution_W / XPS17_W
+pixelr_H = 1.0 * resolution_H / SCREEN_H
+pixelr_W = 1.0 * resolution_W / SCREEN_W
 
 # parameters setting
 cap_region_x_begin=0.5  # start point/total width
@@ -385,9 +385,9 @@ if __name__ == '__main__':
 
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
 
-                mock_direction = dwell_direction((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
-                # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - XPS17_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
-                X = (gaze_p[0] + XPS17_W / 2) * pixelr_W
+                mock_direction = dwell_direction((gaze_p[0] - SCREEN_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
+                # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - SCREEN_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
+                X = (gaze_p[0] + SCREEN_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
 
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
