@@ -82,7 +82,7 @@ def dwell_direction(x, y, resolution_H, resolution_W):
         return "right"
 
     else:
-        return "backward"
+        return "forward"
 
 # multithread code (I need this)
 class DrawingThread(Thread):
@@ -141,7 +141,7 @@ def is_moving(msg):
 
 def encode_msg(status, direction, spacekey, last_msg):
 
-    if (status == 'open' or spacekey) and is_moving(last_msg):
+    if spacekey and is_moving(last_msg):
         return last_msg 
 
 
@@ -171,27 +171,27 @@ def encode_msg(status, direction, spacekey, last_msg):
     #============= send move signals (to revert back) ================#
     #=================================================================#
 
-    if (status == 'open' or spacekey) and direction == 'forward':
+    if (spacekey) and direction == 'forward':
      
         msg.linear.x = speed
         cur_moving = True
         # print("YEEEtttttttt")
             
 
-    elif (status == 'open' or spacekey) and direction == 'left':
+    elif (spacekey) and direction == 'left':
        
         msg.angular.z = ang_sped
         cur_moving = True
         # print("YEEEtttttttt")
 
-    elif (status == 'open' or spacekey) and direction == 'right':
+    elif (spacekey) and direction == 'right':
 
         msg.angular.z = -ang_sped
 
         cur_moving = True 
         # print("YEEEtttttttt")
 
-    elif (status == 'open' or spacekey) and direction == 'backward':
+    elif (spacekey) and direction == 'backward':
 
         msg.linear.x = -speed
         cur_moving = True
@@ -349,6 +349,8 @@ if __name__ == '__main__':
             cur_status = None
             cur_direction = None
             cur_spacekey = None
+            X=0
+            Y=0
 
             for (ii, rect_s) in enumerate(rects_small):
                 
@@ -390,13 +392,19 @@ if __name__ == '__main__':
                 X = (gaze_p[0] + SCREEN_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
 
+                
+
                 # cur_direction = face_utils.angle_to_direction(y_result[0])
                 cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
 
                 # print('mouth: %s eye: %s' % (cur_status, cur_direction))
 
                 break
-            
+
+            # img_gaze = np.zeros((resolution_H, resolution_W), np.uint8)
+            # cv2.circle(img_gaze, (int(X), int(Y)), 10, (255, 255, 255), -1)
+            # cv2.imshow('img gaze', img_gaze)
+
             cv2.imshow("frame", frame_small)
             # cv2.imshow("face_img", face_img)
             # cv2.imshow("left_img", left_img)

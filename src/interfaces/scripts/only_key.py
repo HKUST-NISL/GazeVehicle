@@ -139,7 +139,7 @@ def is_moving(msg):
 
 def encode_msg(status, direction, spacekey, last_msg):
 
-    if (status == 'open' or spacekey) and is_moving(last_msg):
+    if (spacekey) and is_moving(last_msg):
         return last_msg 
 
 
