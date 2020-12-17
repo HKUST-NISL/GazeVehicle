@@ -3,6 +3,9 @@
 .idea
 /devel
 /build
+/bags
+
+*.bag
 *.o
 *.so
 *.tgz
