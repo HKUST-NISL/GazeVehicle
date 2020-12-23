@@ -23,7 +23,7 @@ from Tkinter import *
 import tkMessageBox
 import Tkinter as tk
 from threading import Thread
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose2D
 
 import time
 import pyautogui
@@ -237,6 +237,7 @@ if __name__ == '__main__':
 
     # =================================================================================== #
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    pub_gaze = rospy.Publisher('/gaze_to_camera', Pose2D, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
 
@@ -370,14 +371,14 @@ if __name__ == '__main__':
                 for i, (x, y) in enumerate(shape):
                     cv2.circle(frame_small, (int(x*scale), int(y*scale)), 1, (0, 0, 255), -1)
 
+                # eye gaze estimation
+                face_img, left_img, rigt_img, eye_lm, fc_c_world = \
+                    pre_eye.WarpNCrop(frame[:,:,::-1], shape, inv_cameraMat, cam_new)
+
                 if face_img.shape[0] != 96 or face_img.shape[1] != 96 or \
                     left_img.shape[0] != 64 or left_img.shape[1] != 96 or \
                     rigt_img.shape[0] != 64 or rigt_img.shape[1] != 96 :
                     break
-
-                # eye gaze estimation
-                face_img, left_img, rigt_img, eye_lm, fc_c_world = \
-                    pre_eye.WarpNCrop(frame[:,:,::-1], shape, inv_cameraMat, cam_new)
 
                 y_result, eye_tensor, face_tensor = sess.run([y_conv, h_trans, face_h_trans], feed_dict={
                                                     x_f: face_img[None, :],
@@ -385,6 +386,8 @@ if __name__ == '__main__':
                                                     x_r: rigt_img[None, :]})
 
                 gaze_p, face_p = gaze_to_screen(y_result[0], rect_s, scale)
+
+                # rospy.loginfo(gaze_p)
 
                 mock_direction = dwell_direction((gaze_p[0] - SCREEN_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, resolution_H, resolution_W)
                 # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - SCREEN_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
@@ -395,6 +398,12 @@ if __name__ == '__main__':
                 # cur_direction = dwell_direction(X, Y, resolution_H, resolution_W)
 
                 # print('mouth: %s eye: %s' % (cur_status, cur_direction))
+
+                gaze_msg = Pose2D()
+                gaze_msg.x = gaze_p[0]
+                gaze_msg.y = gaze_p[1]
+                gaze_msg.theta = 0
+                pub_gaze.publish(gaze_msg)
 
                 break
             
