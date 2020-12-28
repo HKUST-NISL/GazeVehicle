@@ -5,7 +5,7 @@ import rosbag
 
 axis_detour = [9.0, 9.0]
 # bag = rosbag.Bag('bags/detour_gaze_key_2020-12-28-11-53-49.bag')
-bag = rosbag.Bag('bags/detour_virtual_key_2020-12-28-12-08-37.bag')
+bag = rosbag.Bag('bags/detour_virtual_key_2020-12-28-12-39-52.bag')
 
 x = []
 y = []
