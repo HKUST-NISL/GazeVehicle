@@ -25,7 +25,7 @@ from Tkinter import *
 import tkMessageBox
 import Tkinter as tk
 from threading import Thread
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose2D
 
 import time
 import pyautogui
@@ -239,6 +239,7 @@ if __name__ == '__main__':
 
     # =================================================================================== #
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    pub_gaze = rospy.Publisher('/gaze_to_camera', Pose2D, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10) # 10hz
     
@@ -391,6 +392,12 @@ if __name__ == '__main__':
                 # print("scaled dimensions: W: %d H: %d Direction: %s" %((gaze_p[0] - SCREEN_W / 2) * pixelr_W, gaze_p[1] * pixelr_H, mock_direction))
                 X = (gaze_p[0] + SCREEN_W / 2) * pixelr_W
                 Y = gaze_p[1] * pixelr_H 
+
+                gaze_msg = Pose2D()
+                gaze_msg.x = gaze_p[0]
+                gaze_msg.y = gaze_p[1]
+                gaze_msg.theta = 0
+                pub_gaze.publish(gaze_msg)
 
                 
 

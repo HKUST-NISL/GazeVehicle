@@ -5,6 +5,11 @@ import numpy as np
 t=time.time()
 
 
+# fx = 633.06324599
+# fy = 633.06324599
+# u0 = 441.39804136
+# v0 = 257.74826685
+
 fx = 1536
 fy = 1536
 u0 = 960
@@ -68,7 +73,7 @@ def gaze_to_screen(gaze, face, scale=0.25):
 
     p1 = np.dot(Rcf, vec3d_e)[:3].reshape((-1))
 
-    xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) 
+    xg = p0[0] - p0[2] / (p1[2]-p0[2]) * (p1[0]-p0[0]) + 2
     yg = p0[1] - p0[2] / (p1[2]-p0[2]) * (p1[1]-p0[1]) 
 
     xg = -xg
