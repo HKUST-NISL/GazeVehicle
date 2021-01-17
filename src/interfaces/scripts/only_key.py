@@ -206,34 +206,7 @@ def encode_msg(status, direction, spacekey, last_msg):
 
 
 if __name__ == '__main__':
-    print("start GUI")
-   
-    gui_thread = DrawingThread()
 
-    # start the drawing thread
-    # gui_thread.start()
-    
-    get_input = True
-
-    root1 = tk.Tk()
-    root2 = tk.Tk()
-    root3 = tk.Tk()
-    root4 = tk.Tk()
-
-    root1.title("UP")
-    root2.title("DOWN")
-    root3.title("LEFT")
-    root4.title("RIGHT")
-
-    canvas1 = Canvas(root1, width=130, height=130, background='blue')
-    canvas2 = Canvas(root2, width=130, height=130, background='blue')
-    canvas3 = Canvas(root3, width=130, height=130, background='blue')
-    canvas4 = Canvas(root4, width=130, height=130, background='blue')
-    
-    canvas1.grid(row=0, column = 0)
-    canvas2.grid(row=0, column = 0)
-    canvas3.grid(row=0, column = 0)
-    canvas4.grid(row=0, column = 0)
 
     # =================================================================================== #
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
@@ -473,71 +446,3 @@ if __name__ == '__main__':
             pub.publish(msg)
 
             success, frame = video_capture.read()
-
-            #=================================================================#
-            #============= setting up the buttons for the thread =============#
-            #=================================================================#
-            
-
-            # UP
-            if get_input and upkey :
-               
-                canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = True
-
-
-            # DOWN
-            elif get_input and downkey:
-                
-                canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = True
-                
-
-            # LEFT
-            elif get_input and leftkey:
-                
-                canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                get_input = True
-
-
-            # RIGHT
-            elif get_input and rightkey:
-
-                canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="blue")
-                canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="green")
-                get_input = True
-
-
-            # STOP
-            else:
-                
-                canvas1.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                canvas2.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                canvas3.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                canvas4.create_rectangle(0, 0, 130, 130, outline="#fb0", fill="orange")
-                get_input = True
-
-            
-            
-            root1.update_idletasks()
-            root1.update()
-
-            root2.update_idletasks()
-            root2.update()
-
-            root3.update_idletasks()
-            root3.update()
-
-            root4.update_idletasks()
-            root4.update()

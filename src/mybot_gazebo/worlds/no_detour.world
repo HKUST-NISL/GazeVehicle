@@ -7850,8 +7850,8 @@
           <camera name='head'>
             <horizontal_fov>1.39626</horizontal_fov>
             <image>
-              <width>800</width>
-              <height>600</height>
+              <width>1320</width>
+              <height>720</height>
               <format>R8G8B8</format>
             </image>
             <clip>

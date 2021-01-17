@@ -145,7 +145,7 @@ class DrawingThread(Thread):
         window = Tk()
 
         # UP BUTTONS
-        button = Button(window,text='UP',width=16, height=6)
+        button = Button(window,text='FORWARD',width=16, height=6)
         button.config(font=('Ink Free',50,'bold'))
         button.config(bg='#ff6200')
         button.config(fg='#fffb1f')
@@ -157,7 +157,7 @@ class DrawingThread(Thread):
         button.bind( "<ButtonRelease-1>", STOP )   
 
         # DOWN BUTTONS
-        button9 = Button(window,text='DOWN',width=16, height=6)
+        button9 = Button(window,text='BACKWARD',width=16, height=6)
         button9.config(font=('Ink Free',50,'bold'))
         button9.config(bg='#FF0000')
         button9.config(fg='#fffb1f')
