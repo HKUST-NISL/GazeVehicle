@@ -7,7 +7,7 @@ from gazebo_msgs.msg import LinkStates
 
 rospy.init_node('listener', anonymous=True)
 pub = rospy.Publisher('/vehicle_pose', Pose)
-rate = rospy.Rate(60) # 10hz
+rate = rospy.Rate(100) # 100hz
 
 def callback(msg):
     # rospy.loginfo("img %d %d %d", data.height, data.width, len(data.data))

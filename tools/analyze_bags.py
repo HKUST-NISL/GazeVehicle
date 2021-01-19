@@ -25,12 +25,12 @@ for line in lines:
 
     print(sub_name, env_name, int_name)
 
-    bag = rosbag.Bag(bag_path)
-    bag = rosbag.Bag('/data/ros/bags/obst_only_key_2021-01-19-14-43-39.bag')
+    # bag = rosbag.Bag(bag_path)
+    bag = rosbag.Bag('/data/ros/bags/new_bags/hongjiang/detour_gaze_key_2021-01-18-13-38-11.bag')
     x = []
     ts = []
-    for topic, msg, t in bag.read_messages(topics=['/gaze_to_camera']):
-        # print(msg)
+    for topic, msg, t in bag.read_messages(topics=['/vehicle_pose']):
+        # print(t)
         x.append(msg)
         ts.append(t)
 
