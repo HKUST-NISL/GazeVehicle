@@ -1,7 +1,7 @@
 # GazeVehicle
 use eye gaze to control the movements of a vehicle in ros
 
-<div align=center><img src="./asserts/demo.gif" width="800" height="450" ></div>
+<div align=center><img src="./assets/demo.gif" width="800" height="450" ></div>
 
 ### What's in this repo?
 - [x] A robot with camera sensor
@@ -33,12 +33,12 @@ roslaunch launch/one_of_the_files.launch
 ### Demo
 
 1. Show robot in gazebo simulator
-<div align=center><img src="./asserts/bot_gazebo.png" width="800" height="450" ></div>
+<div align=center><img src="./assets/bot_gazebo.png" width="800" height="450" ></div>
 
 
 2. Show image obtained by the camera on the robot
 
-<div align=center><img src="./asserts/bot_camera.png" width="800" height="450" ></div>
+<div align=center><img src="./assets/bot_camera.png" width="800" height="450" ></div>
 
 
 
