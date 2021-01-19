@@ -21,11 +21,56 @@ def motion_type(msg):
         return Motion.forward
     if msg.linear.x < 0:
         return Motion.backward
-    if msg.angular.z < 0:
-        return Motion.left
     if msg.angular.z > 0:
+        return Motion.left
+    if msg.angular.z < 0:
         return Motion.right
     return Motion.still
+
+def analyze_motion_time(cmds):
+    t_motions = np.zeros(5)
+    
+    last_m = motion_type(cmds[0][1])
+    last_t = cmds[0][0]
+    for i in range(1, len(cmds)):
+        cur_m = motion_type(cmds[i][1])
+        cur_t = cmds[i][0]
+
+        t_motions[cur_m.value] += cur_t.to_nsec() - last_t.to_nsec()
+
+        last_m = cur_m
+        last_t = cur_t
+    
+    return t_motions / 1e+9
+
+def analyze_pose(poses):
+
+    dist_motion = 0
+    last_p = poses[0][1].position
+    
+    for i in range(1, len(poses)):
+        cur_p = poses[i][1].position
+
+        dist_motion += np.sqrt((cur_p.x - last_p.x)**2 + (cur_p.y - last_p.y)**2)
+
+        last_p = cur_p
+    
+    return dist_motion * 5
+
+def analyze_gaze(gazes):
+    dist_gaze = 0
+    last_p = gazes[0][1]
+    
+    for i in range(1, len(gazes)):
+        cur_p = gazes[i][1]
+
+        dist_gaze += np.sqrt((cur_p.x - last_p.x)**2 + (cur_p.y - last_p.y)**2)
+
+        last_p = cur_p
+    
+    return dist_gaze
+
+
 
 
 if __name__ == "__main__":
@@ -35,6 +80,8 @@ if __name__ == "__main__":
 
     with open(bag_list) as f:
         lines = f.read().splitlines()
+
+    df = pd.DataFrame()
 
     for line in lines:
         
@@ -47,10 +94,8 @@ if __name__ == "__main__":
         int_name = bag_splits[1] + '_' + bag_splits[2]
         sub_name = dir_splits[-1]
 
-        print(sub_name, env_name, int_name)
-
-        # bag = rosbag.Bag(bag_path)
-        bag = rosbag.Bag('/data/ros/bags/hongjiang/detour_gaze_key_2021-01-18-13-38-11.bag')
+        bag = rosbag.Bag(bag_path)
+        # bag = rosbag.Bag('/data/ros/bags/hongjiang/detour_gaze_key_2021-01-18-13-38-11.bag')
         
         cmds = []
         gazes = []
@@ -91,12 +136,33 @@ if __name__ == "__main__":
                 poses = poses[:len(poses)-1-ind]
                 break
     
-        print(len(cmds))
-        print(len(gazes))
-        print(len(poses))
-        print(cmds[-1][0] - cmds[0][0])
-        print(gazes[-1][0] - gazes[0][0])
-        print(poses[-1][0] - poses[0][0])
-        break
 
+        t_tol = (cmds[-1][0] - cmds[0][0]).to_nsec() / 1e+9
 
+        t_motions = analyze_motion_time(cmds)
+        t_still = t_motions[0]
+        t_linear = t_motions[1] + t_motions[2]
+        t_angler = t_motions[3] + t_motions[4]
+        dist_motion = analyze_pose(poses)
+        vel_motion = dist_motion / t_tol
+        dis_gaze = analyze_gaze(gazes)
+        # print(t_tol, t_still, t_linear, t_angler, dist_motion, vel_motion, dis_gaze)
+
+        new = pd.DataFrame({'env': env_name,
+                        'interface': int_name,
+                        'subject': sub_name,
+                        't_total': t_tol, 
+                        't_still': t_still,
+                        't_linear':t_linear,
+                        't_angler': t_angler,
+                        'diststance': dist_motion,
+                        'speed_avg': vel_motion,
+                        'gaze distance': dis_gaze}, index=[1])
+                
+        df = df.append(new, ignore_index=True) 
+        
+        # break
+    cols=['env', 'interface', 'subject', 't_total', 't_still', 't_linear', 't_angler', 'diststance', 'speed_avg', 'gaze distance']
+    df=df[cols]
+    # df.set_index(['env', 'interface', 'subject'])
+    print(df)
