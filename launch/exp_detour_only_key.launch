@@ -10,6 +10,6 @@
 
   <include file="$(find interfaces)/launch/only_key.launch" />
 
-  <node name="record" pkg="rosbag" type="record" args=" /cmd_vel /gaze_to_camera /gazebo/link_states  -o $(find interfaces)/../../bags/detour_only_key" output="screen"/>
+  <node name="record" pkg="rosbag" type="record" args=" /cmd_vel /gaze_to_camera /vehicle_pose  -o $(find interfaces)/../../bags/detour_only_key" output="screen"/>
 
 </launch>

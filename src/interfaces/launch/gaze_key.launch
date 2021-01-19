@@ -2,7 +2,7 @@
 
 <launch>
 
-  <node pkg="interfaces" type="image_process.py" name="image_process" output="screen" />
+  <node pkg="interfaces" type="vechicle_pose.py" name="vechicle_pose" output="screen" />
   <node pkg="interfaces" type="gaze_key.py" name="interface_gaze_key" output="screen" />
 
 </launch>

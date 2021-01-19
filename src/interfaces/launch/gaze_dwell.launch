@@ -2,6 +2,7 @@
 
 <launch>
 
+  <node pkg="interfaces" type="vechicle_pose.py" name="vechicle_pose" output="screen" />
   <node pkg="interfaces" type="gaze_dwell.py" name="interface_gaze_dwell" output="screen" />
 
 </launch>

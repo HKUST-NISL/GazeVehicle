@@ -2,6 +2,8 @@
 
 <launch>
 
+  <node pkg="interfaces" type="vechicle_pose.py" name="vechicle_pose" output="screen" />
   <node pkg="interfaces" type="only_key.py" name="interface_only_key" output="screen" />
+  
 
 </launch>
