@@ -7,6 +7,7 @@ import pandas as pd
 
 from enum import Enum, unique
 
+
 @unique
 class Motion(Enum):
     still = 0 
@@ -76,8 +77,8 @@ def analyze_gaze(gazes):
 if __name__ == "__main__":
         
     root_dir = './bags/'
-    bag_list = './bags/bag.lst'
-    # bag_list = './bags/bag_lak.lst'
+    # bag_list = './bags/bag.lst'
+    bag_list = './bags/bag_subs.lst'
 
     with open(bag_list) as f:
         lines = f.read().splitlines()
@@ -96,7 +97,6 @@ if __name__ == "__main__":
         sub_name = dir_splits[-1]
 
         bag = rosbag.Bag(bag_path)
-        # bag = rosbag.Bag('/data/ros/bags/trap_virtual_key_2021-01-20-16-00-57.bag')
         
         cmds = []
         gazes = []
@@ -156,14 +156,16 @@ if __name__ == "__main__":
                         't_still': t_still,
                         't_linear':t_linear,
                         't_angler': t_angler,
-                        'diststance': dist_motion,
+                        'distance': dist_motion,
                         'speed_avg': vel_motion,
                         'gaze distance': dis_gaze}, index=[1])
                 
         df = df.append(new, ignore_index=True) 
         
         # break
-    cols=['env', 'interface', 'subject', 't_total', 't_still', 't_linear', 't_angler', 'diststance', 'speed_avg', 'gaze distance']
+    cols=['env', 'interface', 'subject', 't_total', 't_still', 't_linear', 't_angler', 'distance', 'speed_avg', 'gaze distance']
     df=df[cols]
     # df.set_index(['env', 'interface', 'subject'])
     print(df)
+
+    df.to_csv(os.path.join(root_dir, 'result.csv'))
