@@ -6,7 +6,7 @@ from gazebo_msgs.msg import LinkStates
 
 
 rospy.init_node('listener', anonymous=True)
-pub = rospy.Publisher('/vehicle_pose', Pose)
+pub = rospy.Publisher('/vehicle_pose', Pose, queue_size=10)
 rate = rospy.Rate(100) # 100hz
 
 def callback(msg):

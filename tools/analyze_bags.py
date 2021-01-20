@@ -55,7 +55,7 @@ def analyze_pose(poses):
 
         last_p = cur_p
     
-    return dist_motion * 5
+    return dist_motion #* 5
 
 def analyze_gaze(gazes):
     dist_gaze = 0
@@ -77,6 +77,7 @@ if __name__ == "__main__":
         
     root_dir = './bags/'
     bag_list = './bags/bag.lst'
+    # bag_list = './bags/bag_lak.lst'
 
     with open(bag_list) as f:
         lines = f.read().splitlines()
@@ -95,7 +96,7 @@ if __name__ == "__main__":
         sub_name = dir_splits[-1]
 
         bag = rosbag.Bag(bag_path)
-        # bag = rosbag.Bag('/data/ros/bags/hongjiang/detour_gaze_key_2021-01-18-13-38-11.bag')
+        # bag = rosbag.Bag('/data/ros/bags/trap_virtual_key_2021-01-20-16-00-57.bag')
         
         cmds = []
         gazes = []
