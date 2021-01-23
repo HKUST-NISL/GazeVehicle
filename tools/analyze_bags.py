@@ -78,7 +78,7 @@ if __name__ == "__main__":
         
     root_dir = './bags/'
     # bag_list = './bags/bag.lst'
-    bag_list = './bags/bag_subs.lst'
+    bag_list = './bags/bag_vera.lst'
 
     with open(bag_list) as f:
         lines = f.read().splitlines()
