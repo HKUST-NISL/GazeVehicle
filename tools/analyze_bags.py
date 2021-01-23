@@ -130,8 +130,7 @@ def get_cmd_pose_gaze(bag):
 if __name__ == "__main__":
         
     root_dir = './bags/'
-    # bag_list = './bags/bag.lst'
-    bag_list = './bags/bag_vera.lst'
+    bag_list = './bags/bag.lst'
 
     with open(bag_list) as f:
         lines = f.read().splitlines()
