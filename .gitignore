@@ -5,6 +5,8 @@
 /build
 /bags
 
+/*.png
+
 *.bag
 *.o
 *.so

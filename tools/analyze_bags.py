@@ -28,21 +28,35 @@ def motion_type(msg):
         return Motion.right
     return Motion.still
 
+def motion_turn(motion):
+
+    if motion == Motion.left or motion == Motion.right:
+        return True
+    
+    return False
+
 def analyze_motion_time(cmds):
     t_motions = np.zeros(5)
-    
+    num_turns = 0
     last_m = motion_type(cmds[0][1])
     last_t = cmds[0][0]
+    last_turn = motion_turn(last_m)
     for i in range(1, len(cmds)):
         cur_m = motion_type(cmds[i][1])
         cur_t = cmds[i][0]
-
+        cur_turn = motion_turn(cur_m)
         t_motions[cur_m.value] += cur_t.to_nsec() - last_t.to_nsec()
+
+        if (last_turn) and (not cur_turn):
+            num_turns += 1
 
         last_m = cur_m
         last_t = cur_t
+        last_turn = cur_turn
+
+        
     
-    return t_motions / 1e+9
+    return t_motions / 1e+9, num_turns
 
 def analyze_pose(poses):
 
@@ -71,6 +85,45 @@ def analyze_gaze(gazes):
     
     return dist_gaze
 
+def get_cmd_pose_gaze(bag):
+    cmds = []
+    gazes = []
+    poses = []
+    Moving = False
+    for topic, msg, t in bag.read_messages(topics=['/cmd_vel', '/gaze_to_camera', '/vehicle_pose']):
+
+        if not Moving:
+            # remove the begining stills
+            if topic == '/cmd_vel':
+                if motion_type(msg) == Motion.still:
+                    continue
+                else:
+                    Moving = True
+        if Moving:
+            if topic == '/cmd_vel':
+                cmds.append((t, msg))
+            if topic == '/gaze_to_camera':
+                gazes.append((t, msg))
+            if topic == '/vehicle_pose':
+                poses.append((t, msg))
+
+    # remove the last stills 
+    for ind, cmd in enumerate(cmds[::-1]):
+        if motion_type(cmd[1]) != Motion.still:
+            cmds = cmds[:len(cmds)-1-ind]
+            break 
+
+    for ind, gaze in enumerate(gazes[::-1]):
+        if gaze[0] < cmds[-1][0]:
+            gazes = gazes[:len(gazes)-1-ind]
+            break
+
+    for ind, pose in enumerate(poses[::-1]):
+        if pose[0] < cmds[-1][0]:
+            poses = poses[:len(poses)-1-ind]
+            break
+
+    return cmds, poses, gazes
 
 
 
@@ -87,6 +140,8 @@ if __name__ == "__main__":
 
     for line in lines:
         
+        if 'detour' in line:
+            continue
         bag_path = os.path.join(root_dir, line)
         dir_name, bag_name = os.path.split(bag_path)
         dir_splits = dir_name.split('/')
@@ -98,49 +153,12 @@ if __name__ == "__main__":
 
         bag = rosbag.Bag(bag_path)
         
-        cmds = []
-        gazes = []
-        poses = []
-        t_start = 0
-        t_end = 0
-        Moving = False
-        for topic, msg, t in bag.read_messages(topics=['/cmd_vel', '/gaze_to_camera', '/vehicle_pose']):
-
-            if not Moving:
-                # remove the begining stills
-                if topic == '/cmd_vel':
-                    if motion_type(msg) == Motion.still:
-                        continue
-                    else:
-                        Moving = True
-            if Moving:
-                if topic == '/cmd_vel':
-                    cmds.append((t, msg))
-                if topic == '/gaze_to_camera':
-                    gazes.append((t, msg))
-                if topic == '/vehicle_pose':
-                    poses.append((t, msg))
-
-        # remove the last stills 
-        for ind, cmd in enumerate(cmds[::-1]):
-            if motion_type(cmd[1]) != Motion.still:
-                cmds = cmds[:len(cmds)-1-ind]
-                break 
-
-        for ind, gaze in enumerate(gazes[::-1]):
-            if gaze[0] < cmds[-1][0]:
-                gazes = gazes[:len(gazes)-1-ind]
-                break
-
-        for ind, pose in enumerate(poses[::-1]):
-            if pose[0] < cmds[-1][0]:
-                poses = poses[:len(poses)-1-ind]
-                break
+        cmds, poses, gazes = get_cmd_pose_gaze(bag)
     
 
         t_tol = (cmds[-1][0] - cmds[0][0]).to_nsec() / 1e+9
 
-        t_motions = analyze_motion_time(cmds)
+        t_motions, num_turns = analyze_motion_time(cmds)
         t_still = t_motions[0]
         t_linear = t_motions[1] + t_motions[2]
         t_angler = t_motions[3] + t_motions[4]
@@ -156,6 +174,7 @@ if __name__ == "__main__":
                         't_still': t_still,
                         't_linear':t_linear,
                         't_angler': t_angler,
+                        'num_turns': num_turns,
                         'distance': dist_motion,
                         'speed_avg': vel_motion,
                         'gaze distance': dis_gaze}, index=[1])
@@ -163,7 +182,7 @@ if __name__ == "__main__":
         df = df.append(new, ignore_index=True) 
         
         # break
-    cols=['env', 'interface', 'subject', 't_total', 't_still', 't_linear', 't_angler', 'distance', 'speed_avg', 'gaze distance']
+    cols=['env', 'interface', 'subject', 't_total', 't_still', 't_linear', 't_angler', 'num_turns', 'distance', 'speed_avg', 'gaze distance']
     df=df[cols]
     # df.set_index(['env', 'interface', 'subject'])
     print(df)
