@@ -53,6 +53,15 @@ roslaunch launch/one_of_the_files.launch
 ### Cite
 This repo's model is from the paper below:
 ```
+@inproceedings{poy2021multimodal,
+  title={A multimodal direct gaze interface for wheelchairs and teleoperated robots},
+  author={Poy, Isamu and Wu, Liang and Shi, Bertram E},
+  booktitle={2021 43rd Annual International Conference of the IEEE Engineering in Medicine \& Biology Society (EMBC)},
+  pages={4796--4800},
+  year={2021},
+  organization={IEEE}
+}
+
 @inproceedings{chen2018appearance,
   title={Appearance-based gaze estimation using dilated-convolutions},
   author={Chen, Zhaokang and Shi, Bertram E},
